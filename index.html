@@ -4,513 +4,559 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NOMAD-M — Из отходов в удобрение</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* === TOKENS === */
 :root {
-  --ink:       #0f1a0d;
-  --ink2:      #1c2e19;
-  --ink3:      #2a4226;
-  --ground:    #f5f7f2;
-  --ground2:   #edf0e8;
-  --ground3:   #e0e6d8;
-  --white:     #ffffff;
-  --lime:      #5cbf2a;
-  --lime-d:    #3d8c1a;
-  --lime-l:    #a8e070;
-  --lime-bg:   rgba(92,191,42,0.08);
-  --lime-glow: rgba(92,191,42,0.22);
-  --amber:     #e8900a;
-  --red:       #d93b2b;
-  --blue:      #2a7bbf;
-  --text:      #2c3e28;
-  --text2:     #5a7050;
-  --text3:     #8aa07a;
-  --border:    #d4ddc8;
-  --border2:   #c2ceb8;
-  --hd: 'Manrope', sans-serif;
-  --ui: 'Space Grotesk', sans-serif;
-  --mono: 'JetBrains Mono', monospace;
-  --r: 10px;
-  --r2: 6px;
+  --coal:    #161410;
+  --coal2:   #1e1b17;
+  --coal3:   #272320;
+  --coal4:   #322e2a;
+  --phos:    #D4FF1E;
+  --phos2:   #a8cc10;
+  --phos3:   #6a8208;
+  --phos-bg: rgba(212,255,30,0.07);
+  --phos-glow: rgba(212,255,30,0.18);
+  --cream:   #F0EBE0;
+  --cream2:  #c8c0b0;
+  --cream3:  #8a8070;
+  --amber:   #F59E0B;
+  --red:     #EF4444;
+  --blue:    #60A5FA;
+  --border:  rgba(212,255,30,0.1);
+  --border2: rgba(212,255,30,0.18);
+  --hd:   'Syne', sans-serif;
+  --body: 'DM Sans', sans-serif;
+  --mono: 'Fira Code', monospace;
 }
-
-*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-html { scroll-behavior:smooth; }
-
-body {
-  background: var(--ground);
-  color: var(--text);
-  font-family: var(--ui);
-  font-size: 16px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--coal);
+  color:var(--cream2);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
 }
-
-/* === NAV === */
-.nav {
-  position: sticky; top: 0; z-index: 200;
-  background: rgba(245,247,242,0.94);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(10px);
-  padding: 0 40px;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 62px;
+ 
+/* ── CURSOR GLOW ── */
+.cursor-glow{
+  position:fixed;width:400px;height:400px;
+  background:radial-gradient(circle,rgba(212,255,30,0.04) 0%,transparent 70%);
+  border-radius:50%;pointer-events:none;z-index:0;
+  transform:translate(-50%,-50%);transition:transform .08s linear;
 }
-.nav-brand {
-  font-family: var(--hd); font-size: 18px; font-weight: 800;
-  color: var(--ink); letter-spacing: -0.5px;
+ 
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  padding:0 48px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(22,20,16,0.85);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(16px);
+  transition:border-color .3s;
 }
-.nav-brand em { color: var(--lime); font-style: normal; }
-.nav-links { display: flex; gap: 28px; }
-.nav-links a {
-  font-size: 13px; font-weight: 500; color: var(--text2);
-  text-decoration: none; letter-spacing: 0.2px;
-  transition: color .2s;
+.nav-brand{
+  font-family:var(--hd);font-size:20px;font-weight:800;
+  color:var(--cream);letter-spacing:-0.5px;
+  display:flex;align-items:center;gap:2px;
 }
-.nav-links a:hover { color: var(--lime-d); }
-.nav-btn {
-  background: var(--lime); color: white; border: none;
-  font-family: var(--ui); font-size: 13px; font-weight: 600;
-  padding: 10px 22px; border-radius: 20px; cursor: pointer;
-  transition: all .2s; letter-spacing: 0.2px;
+.nav-brand-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--phos);
+  box-shadow:0 0 12px var(--phos);
+  margin:0 3px;
+  animation:pulseDot 2s ease-in-out infinite;
 }
-.nav-btn:hover { background: var(--lime-d); transform: translateY(-1px); }
-
-/* === HERO === */
-.hero {
-  min-height: calc(100vh - 62px);
-  display: grid; grid-template-columns: 1fr 1fr;
-  align-items: center; gap: 60px;
-  padding: 80px 40px;
-  max-width: 1200px; margin: 0 auto;
+@keyframes pulseDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.7}}
+.nav-links{display:flex;gap:32px;}
+.nav-links a{
+  font-size:13px;font-weight:400;color:var(--cream3);
+  text-decoration:none;letter-spacing:0.3px;
+  transition:color .2s;position:relative;
 }
-.hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--lime-bg); border: 1px solid var(--lime-l);
-  color: var(--lime-d); font-size: 12px; font-weight: 600;
-  padding: 6px 14px; border-radius: 20px; letter-spacing: 0.5px;
-  text-transform: uppercase; margin-bottom: 24px;
+.nav-links a::after{
+  content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;
+  background:var(--phos);transition:width .25s ease;
 }
-.hero-eyebrow::before { content:'●'; font-size:8px; color:var(--lime); animation:blink 2s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-.hero h1 {
-  font-family: var(--hd); font-size: clamp(36px,4.5vw,60px);
-  font-weight: 800; line-height: 1.1; letter-spacing: -1.5px;
-  color: var(--ink); margin-bottom: 20px;
+.nav-links a:hover{color:var(--phos);}
+.nav-links a:hover::after{width:100%;}
+.nav-btn{
+  font-family:var(--hd);font-size:13px;font-weight:700;
+  color:var(--coal);background:var(--phos);border:none;
+  padding:10px 24px;border-radius:2px;cursor:pointer;
+  letter-spacing:0.5px;text-transform:uppercase;
+  transition:all .25s;position:relative;overflow:hidden;
 }
-.hero h1 mark {
-  background: none; color: var(--lime);
-  position: relative;
+.nav-btn::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,0.15);
+  transform:translateX(-100%);transition:transform .3s ease;
 }
-.hero h1 mark::after {
-  content: '';
-  position: absolute; bottom: 2px; left: 0; right: 0; height: 3px;
-  background: var(--lime-l); border-radius: 2px;
+.nav-btn:hover::before{transform:translateX(0);}
+.nav-btn:hover{box-shadow:0 0 28px var(--phos-glow);}
+ 
+/* ── HERO ── */
+.hero{
+  position:relative;min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:100px 48px 80px;overflow:hidden;
 }
-.hero-lead {
-  font-size: 17px; color: var(--text2); line-height: 1.75;
-  margin-bottom: 36px; max-width: 480px;
+.hero-canvas{
+  position:absolute;inset:0;z-index:0;opacity:.6;
 }
-.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 48px; }
-.btn-main {
-  background: var(--ink); color: white; border: none;
-  font-family: var(--ui); font-size: 15px; font-weight: 600;
-  padding: 15px 32px; border-radius: var(--r); cursor: pointer;
-  transition: all .22s; letter-spacing: -0.2px;
+.hero-inner{position:relative;z-index:1;max-width:1120px;margin:0 auto;width:100%;}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:11px;color:var(--phos3);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:32px;
+  opacity:0;animation:fadeUp .8s .2s ease forwards;
 }
-.btn-main:hover { background: var(--ink2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
-.btn-sec {
-  background: transparent; color: var(--text); border: 1.5px solid var(--border2);
-  font-family: var(--ui); font-size: 15px; font-weight: 500;
-  padding: 15px 28px; border-radius: var(--r); cursor: pointer;
-  transition: all .22s;
+.hero-tag::before{content:'';width:28px;height:1px;background:var(--phos3);}
+.hero-h1{
+  font-family:var(--hd);font-size:clamp(44px,6.5vw,88px);
+  font-weight:800;line-height:1.02;letter-spacing:-3px;
+  color:var(--cream);max-width:800px;margin-bottom:28px;
+  opacity:0;animation:fadeUp .9s .35s ease forwards;
 }
-.btn-sec:hover { border-color: var(--lime); color: var(--lime-d); }
-.hero-stats { display: flex; gap: 32px; }
-.hstat { border-left: 2px solid var(--lime); padding-left: 14px; }
-.hstat-n { font-family: var(--hd); font-size: 28px; font-weight: 800; color: var(--ink); letter-spacing: -1px; }
-.hstat-l { font-size: 12px; color: var(--text3); margin-top: 2px; }
-
-/* hero visual */
-.hero-visual {
-  position: relative;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+.hero-h1 .phos{
+  color:var(--phos);
+  text-shadow:0 0 60px rgba(212,255,30,.25);
+  display:inline-block;
 }
-.hero-vis-header {
-  background: var(--ink); padding: 12px 18px;
-  display: flex; align-items: center; justify-content: space-between;
+.hero-h1 .line2{
+  color:var(--cream3);font-weight:300;
+  font-style:italic;letter-spacing:-1px;
 }
-.hero-vis-title { font-family: var(--mono); font-size: 11px; color: #7a9a70; letter-spacing: 1px; }
-.hero-vis-dots { display: flex; gap: 6px; }
-.hero-vis-dot { width: 10px; height: 10px; border-radius: 50%; }
-.hero-vis-body { padding: 20px 18px; background: var(--ink); }
-.hero-vis-body canvas { width: 100%; display: block; border-radius: 6px; }
-.hero-vis-foot {
-  background: var(--white); padding: 16px 18px;
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+.hero-sub{
+  font-size:18px;font-weight:300;color:var(--cream3);
+  max-width:520px;line-height:1.8;margin-bottom:48px;
+  opacity:0;animation:fadeUp .9s .5s ease forwards;
 }
-.vis-stat {
-  background: var(--ground); border: 1px solid var(--border);
-  border-radius: var(--r2); padding: 12px 14px;
+.hero-actions{
+  display:flex;gap:16px;flex-wrap:wrap;margin-bottom:72px;
+  opacity:0;animation:fadeUp .9s .65s ease forwards;
 }
-.vis-stat-v { font-family: var(--mono); font-size: 18px; font-weight: 500; color: var(--lime-d); }
-.vis-stat-l { font-size: 11px; color: var(--text3); margin-top: 3px; }
-.scan-badge {
-  position: absolute; top: 56px; right: 16px;
-  background: var(--lime); color: white;
-  font-family: var(--mono); font-size: 10px; font-weight: 500;
-  padding: 4px 10px; border-radius: 12px; letter-spacing: 0.5px;
-  animation: blink 2s infinite;
+.btn-phos{
+  font-family:var(--hd);font-size:14px;font-weight:700;
+  color:var(--coal);background:var(--phos);border:none;
+  padding:16px 36px;border-radius:2px;cursor:pointer;
+  letter-spacing:0.5px;text-transform:uppercase;
+  transition:all .25s;position:relative;overflow:hidden;
 }
-
-/* === SECTION WRAPPER === */
-.section { padding: 100px 40px; }
-.section-inner { max-width: 1120px; margin: 0 auto; }
-.section-alt { background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-.eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 12px; font-weight: 600; color: var(--text3);
-  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;
+.btn-phos:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 40px rgba(212,255,30,.3);
 }
-.eyebrow::before { content:''; width: 20px; height: 1.5px; background: var(--lime); display: block; }
-.section-title {
-  font-family: var(--hd); font-size: clamp(28px,3.5vw,44px);
-  font-weight: 800; color: var(--ink); letter-spacing: -1px;
-  line-height: 1.15; margin-bottom: 16px;
+.btn-ghost{
+  font-family:var(--body);font-size:15px;font-weight:400;
+  color:var(--cream2);background:transparent;
+  border:1px solid rgba(240,235,224,0.2);
+  padding:16px 32px;border-radius:2px;cursor:pointer;
+  transition:all .25s;letter-spacing:0.2px;
 }
-.section-title em { color: var(--lime); font-style: normal; }
-.section-lead { font-size: 17px; color: var(--text2); line-height: 1.75; max-width: 580px; margin-bottom: 56px; }
-
-/* === PROBLEM CARDS === */
-.problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
-.prob-card {
-  background: var(--white); padding: 36px 32px;
-  border: 1px solid var(--border); border-radius: 0;
-  position: relative; transition: border-color .25s;
+.btn-ghost:hover{border-color:var(--phos);color:var(--phos);}
+.hero-stats{
+  display:flex;gap:48px;
+  padding-top:40px;border-top:1px solid var(--border);
+  opacity:0;animation:fadeUp .9s .8s ease forwards;
 }
-.prob-card:hover { border-color: var(--lime-l); z-index:1; }
-.prob-card:first-child { border-radius: var(--r) 0 0 0; }
-.prob-card:nth-child(2) { border-radius: 0 var(--r) 0 0; }
-.prob-card:nth-child(3) { border-radius: 0 0 0 var(--r); }
-.prob-card:last-child { border-radius: 0 0 var(--r) 0; }
-.prob-icon { font-size: 36px; margin-bottom: 16px; }
-.prob-title { font-family: var(--hd); font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
-.prob-text { font-size: 14px; color: var(--text2); line-height: 1.75; margin-bottom: 20px; }
-.prob-num {
-  font-family: var(--mono); font-size: 26px; font-weight: 500;
-  color: var(--lime-d);
+.hs{border-left:2px solid var(--phos);padding-left:18px;}
+.hs-n{
+  font-family:var(--hd);font-size:32px;font-weight:800;
+  color:var(--phos);letter-spacing:-1px;
+  text-shadow:0 0 24px rgba(212,255,30,.2);
 }
-.prob-num-l { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; margin-top: 2px; }
-
-/* === PROCESS FLOW === */
-.flow-wrap { display: flex; align-items: flex-start; gap: 0; }
-.flow-step {
-  flex: 1; padding: 28px 24px;
-  background: var(--white); border: 1px solid var(--border);
-  position: relative; transition: all .25s; cursor: default;
+.hs-l{font-size:12px;color:var(--cream3);margin-top:3px;letter-spacing:.3px;}
+ 
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+ 
+/* ── SCROLL COUNTER NUMBERS ── */
+.count-num{display:inline-block;transition:all .1s;}
+ 
+/* ── SECTION SHELL ── */
+.s{padding:110px 48px;position:relative;}
+.s-inner{max-width:1120px;margin:0 auto;}
+.s-alt{background:var(--coal2);}
+.s-alt::before,
+.s-alt::after{
+  content:'';position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border2) 20%,var(--border2) 80%,transparent);
 }
-.flow-step:not(:first-child) { border-left: none; }
-.flow-step:first-child { border-radius: var(--r) 0 0 var(--r); }
-.flow-step:last-child  { border-radius: 0 var(--r) var(--r) 0; }
-.flow-step:hover { background: var(--lime-bg); border-color: var(--lime-l); z-index:1; }
-.flow-step:not(:last-child)::after {
-  content: '→'; position: absolute;
-  top: 50%; right: -14px; transform: translateY(-50%);
-  font-size: 18px; color: var(--lime); z-index: 2;
-  background: var(--ground); padding: 2px 1px;
+.s-alt::before{top:0;}
+.s-alt::after{bottom:0;}
+ 
+.eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:10px;color:var(--phos3);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;
 }
-.flow-n { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 1px; margin-bottom: 10px; }
-.flow-ico { font-size: 28px; margin-bottom: 10px; display: block; }
-.flow-title { font-family: var(--hd); font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
-.flow-desc { font-size: 12px; color: var(--text2); line-height: 1.65; }
-.flow-data {
-  font-family: var(--mono); font-size: 10px; color: var(--lime-d);
-  margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
+.eyebrow::before{content:'';width:20px;height:1px;background:var(--phos);}
+.sh2{
+  font-family:var(--hd);font-size:clamp(30px,4vw,52px);
+  font-weight:800;color:var(--cream);letter-spacing:-1.5px;
+  line-height:1.1;margin-bottom:18px;
 }
-
-/* === 3 BLOCKS TECH === */
-.tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-.tech-card {
-  background: var(--white); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 32px 28px;
-  position: relative; overflow: hidden;
-  transition: box-shadow .25s, transform .25s;
+.sh2 em{color:var(--phos);font-style:normal;}
+.s-lead{
+  font-size:17px;font-weight:300;color:var(--cream3);
+  line-height:1.8;max-width:560px;margin-bottom:60px;
 }
-.tech-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.09); }
-.tech-card-top {
-  width: 48px; height: 48px; border-radius: 12px;
-  background: var(--lime-bg); display: flex; align-items: center;
-  justify-content: center; font-size: 22px; margin-bottom: 20px;
-  border: 1px solid var(--lime-l);
+ 
+/* ── REVEAL ── */
+.rv{opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1);}
+.rv.in{opacity:1;transform:none;}
+.rv-d1{transition-delay:.08s;}
+.rv-d2{transition-delay:.16s;}
+.rv-d3{transition-delay:.24s;}
+.rv-d4{transition-delay:.32s;}
+ 
+/* ── PROBLEM GRID ── */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);}
+.pcard{
+  background:var(--coal);padding:40px 36px;
+  position:relative;overflow:hidden;
+  transition:background .3s;
 }
-.tech-tag {
-  display: inline-block; font-family: var(--mono); font-size: 9px;
-  color: var(--lime-d); background: var(--lime-bg); border: 1px solid var(--lime-l);
-  padding: 3px 8px; border-radius: 10px; letter-spacing: 1px;
-  margin-bottom: 12px; text-transform: uppercase;
+.pcard::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--phos3),transparent);
+  transform:scaleX(0);transform-origin:left;transition:transform .4s ease;
 }
-.tech-title { font-family: var(--hd); font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 12px; }
-.tech-desc { font-size: 13px; color: var(--text2); line-height: 1.75; margin-bottom: 24px; }
-.tech-metrics { display: flex; flex-direction: column; gap: 12px; }
-.tmet { }
-.tmet-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
-.tmet-l { font-size: 11px; color: var(--text3); font-weight: 500; }
-.tmet-v { font-family: var(--mono); font-size: 12px; color: var(--lime-d); font-weight: 500; }
-.tmet-bar { height: 4px; background: var(--ground2); border-radius: 2px; overflow: hidden; }
-.tmet-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--lime-l), var(--lime)); transition: width 1s ease; }
-
-/* === NUMBERS === */
-.numbers-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; }
-.num-card {
-  background: var(--white); border: 1px solid var(--border);
-  padding: 40px 32px; text-align: center;
+.pcard:hover::before{transform:scaleX(1);}
+.pcard:hover{background:var(--coal2);}
+.pcard-ico{font-size:40px;margin-bottom:18px;display:block;filter:grayscale(.3);}
+.pcard-title{
+  font-family:var(--hd);font-size:19px;font-weight:700;
+  color:var(--cream);margin-bottom:12px;letter-spacing:-.3px;
 }
-.num-card:first-child { border-radius: var(--r) 0 0 var(--r); }
-.num-card:last-child  { border-radius: 0 var(--r) var(--r) 0; }
-.num-val {
-  font-family: var(--hd); font-size: 52px; font-weight: 800;
-  color: var(--lime-d); letter-spacing: -2px; line-height: 1;
-  margin-bottom: 8px;
+.pcard-text{font-size:14px;color:var(--cream3);line-height:1.8;margin-bottom:24px;}
+.pcard-stat{
+  font-family:var(--hd);font-size:34px;font-weight:800;
+  color:var(--phos);letter-spacing:-1px;
+  text-shadow:0 0 20px rgba(212,255,30,.15);
 }
-.num-val sup { font-size: 24px; color: var(--lime); }
-.num-label { font-size: 13px; color: var(--text2); line-height: 1.6; }
-.num-sub { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 6px; letter-spacing: 0.5px; }
-
-/* ===================== DASHBOARD ===================== */
-.dash-section {
-  background: var(--ink);
-  border-top: 4px solid var(--lime);
-  padding: 0;
+.pcard-stat-l{font-family:var(--mono);font-size:10px;color:var(--cream3);letter-spacing:1px;margin-top:3px;}
+ 
+/* ── FLOW ── */
+.flow{display:flex;position:relative;}
+.flow::before{
+  content:'';position:absolute;top:38px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,var(--phos3),transparent);
+  z-index:0;
 }
-.dash-header {
-  padding: 60px 40px 36px;
-  max-width: 1120px; margin: 0 auto;
-  display: flex; justify-content: space-between; align-items: flex-end;
-  gap: 24px; flex-wrap: wrap;
+.fstep{
+  flex:1;padding:28px 22px;position:relative;z-index:1;
+  background:var(--coal2);border:1px solid var(--border);
+  transition:all .3s;
 }
-.dash-header-text {}
-.dash-eyebrow {
-  font-family: var(--mono); font-size: 11px; color: var(--lime);
-  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
-  opacity: .7;
+.fstep:not(:first-child){border-left:none;}
+.fstep:hover{background:var(--coal3);border-color:var(--border2);}
+.fstep-n{
+  font-family:var(--mono);font-size:9px;color:var(--phos3);
+  letter-spacing:2px;margin-bottom:14px;
 }
-.dash-title {
-  font-family: var(--hd); font-size: clamp(24px,3vw,40px);
-  font-weight: 800; color: white; letter-spacing: -0.5px; line-height: 1.15;
+.fstep-ico{font-size:26px;margin-bottom:10px;display:block;}
+.fstep-title{
+  font-family:var(--hd);font-size:13px;font-weight:700;
+  color:var(--cream);margin-bottom:8px;
 }
-.dash-sub { font-size: 15px; color: #7a9a70; margin-top: 8px; }
-.dash-live-badge {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(92,191,42,0.12); border: 1px solid rgba(92,191,42,0.3);
-  color: var(--lime); padding: 10px 20px; border-radius: 20px;
-  font-family: var(--mono); font-size: 12px; letter-spacing: 1px;
-  white-space: nowrap; flex-shrink: 0;
+.fstep-desc{font-size:12px;color:var(--cream3);line-height:1.7;}
+.fstep-data{
+  font-family:var(--mono);font-size:10px;color:var(--phos);
+  margin-top:12px;padding-top:10px;border-top:1px solid var(--border);
+  opacity:.7;
 }
-.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); animation: blink 1.4s infinite; }
-
+.arrow-between{
+  position:absolute;top:34px;right:-14px;
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--phos);border-radius:50%;z-index:2;
+  font-size:12px;color:var(--coal);font-weight:bold;
+  box-shadow:0 0 16px rgba(212,255,30,.3);
+}
+ 
+/* ── TECH CARDS ── */
+.tgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
+.tcard{
+  background:var(--coal2);border:1px solid var(--border);
+  border-radius:4px;padding:36px 30px;
+  position:relative;overflow:hidden;
+  transition:all .35s cubic-bezier(.22,1,.36,1);
+}
+.tcard::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(212,255,30,.04),transparent);
+  opacity:0;transition:opacity .35s;
+}
+.tcard:hover{transform:translateY(-6px);border-color:var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.tcard:hover::after{opacity:1;}
+.tcard-icon{
+  width:52px;height:52px;border-radius:4px;
+  background:var(--phos-bg);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;margin-bottom:20px;
+  transition:border-color .3s;
+}
+.tcard:hover .tcard-icon{border-color:var(--border2);}
+.tcard-tag{
+  font-family:var(--mono);font-size:9px;color:var(--phos3);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;
+  display:flex;align-items:center;gap:6px;
+}
+.tcard-tag::before{content:'●';font-size:7px;color:var(--phos);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.tcard-title{
+  font-family:var(--hd);font-size:22px;font-weight:800;
+  color:var(--cream);margin-bottom:14px;letter-spacing:-.5px;
+}
+.tcard-desc{font-size:13px;color:var(--cream3);line-height:1.8;margin-bottom:26px;}
+.tmet{margin-bottom:12px;}
+.tmet-row{display:flex;justify-content:space-between;margin-bottom:4px;}
+.tmet-l{font-size:11px;color:var(--cream3);font-weight:400;}
+.tmet-v{font-family:var(--mono);font-size:11px;color:var(--phos);font-weight:500;}
+.tmet-bar{height:3px;background:var(--coal4);border-radius:2px;overflow:hidden;}
+.tmet-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--phos3),var(--phos));transition:width 1.2s cubic-bezier(.22,1,.36,1);}
+ 
+/* ── NUMBERS ── */
+.numgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);}
+.numcard{
+  background:var(--coal);padding:48px 36px;
+  text-align:center;position:relative;overflow:hidden;
+  transition:background .3s;
+}
+.numcard::before{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:40px;height:2px;background:var(--phos3);
+  transition:width .35s ease;opacity:.5;
+}
+.numcard:hover::before{width:80%;}
+.numcard:hover{background:var(--coal2);}
+.numcard-val{
+  font-family:var(--hd);font-size:clamp(40px,5vw,60px);font-weight:800;
+  color:var(--phos);letter-spacing:-2px;line-height:1;margin-bottom:10px;
+  text-shadow:0 0 40px rgba(212,255,30,.2);
+}
+.numcard-val sup{font-size:22px;color:var(--phos2);letter-spacing:0;}
+.numcard-l{font-size:13px;color:var(--cream3);line-height:1.6;}
+.numcard-sub{font-family:var(--mono);font-size:9px;color:var(--cream3);opacity:.4;margin-top:8px;letter-spacing:1px;}
+ 
+/* ═══════════ DASHBOARD ═══════════ */
+.dash-wrap{background:var(--coal);border-top:2px solid var(--phos);}
+.dash-hdr{
+  padding:72px 48px 40px;max-width:1120px;margin:0 auto;
+  display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+}
+.dash-hdr-eyebrow{font-family:var(--mono);font-size:10px;color:var(--phos3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+.dash-hdr-title{font-family:var(--hd);font-size:clamp(26px,3.5vw,44px);font-weight:800;color:var(--cream);letter-spacing:-1px;line-height:1.15;}
+.dash-hdr-sub{font-size:15px;color:var(--cream3);margin-top:8px;font-weight:300;}
+.live-pill{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(212,255,30,.08);border:1px solid rgba(212,255,30,.2);
+  color:var(--phos);padding:12px 22px;border-radius:2px;
+  font-family:var(--mono);font-size:11px;letter-spacing:1.5px;
+  white-space:nowrap;flex-shrink:0;
+}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--phos);animation:blink 1.4s infinite;}
+ 
 /* topbar */
-.d-topbar {
-  background: #0a120a; border-top: 1px solid #1c2e1c; border-bottom: 1px solid #1c2e1c;
-  padding: 0 40px; height: 44px;
-  display: flex; align-items: center; justify-content: space-between;
+.dtop{
+  background:#0d0c09;border-top:1px solid rgba(212,255,30,.08);
+  border-bottom:1px solid rgba(212,255,30,.08);
+  padding:0 48px;height:44px;
+  display:flex;align-items:center;justify-content:space-between;
 }
-.d-logo { font-family: var(--mono); font-size: 11px; color: #4a7a40; letter-spacing: 2px; }
-.d-logo strong { color: var(--lime); }
-.d-bar-status { display: flex; gap: 20px; align-items: center; }
-.d-sitem { display: flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 9px; color: #506050; letter-spacing: 0.5px; }
-.d-sdot { width: 5px; height: 5px; border-radius: 50%; }
-.d-sdot.g { background: var(--lime); box-shadow: 0 0 6px var(--lime); animation: blink 2s infinite; }
-.d-sdot.o { background: var(--amber); box-shadow: 0 0 6px var(--amber); animation: blink 2s infinite; animation-delay:.6s; }
-.d-clock { font-family: var(--mono); font-size: 12px; color: var(--lime); opacity: .8; }
-
+.dtop-logo{font-family:var(--mono);font-size:11px;color:rgba(212,255,30,.4);letter-spacing:2px;}
+.dtop-logo strong{color:var(--phos);}
+.dtop-status{display:flex;gap:20px;}
+.dsi{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:rgba(212,255,30,.3);letter-spacing:.5px;}
+.dsd{width:5px;height:5px;border-radius:50%;}
+.dsd.g{background:var(--phos);box-shadow:0 0 6px var(--phos);animation:blink 2s infinite;}
+.dsd.a{background:var(--amber);box-shadow:0 0 6px var(--amber);animation:blink 2s .5s infinite;}
+.dtop-clk{font-family:var(--mono);font-size:12px;color:var(--phos);opacity:.6;}
+ 
 /* panel grid */
-.d-panels {
-  display: grid; grid-template-columns: 1fr 1.1fr 0.9fr;
-  background: #0d160d; gap: 1px;
-  border-top: 1px solid #1c2e1c; border-bottom: 1px solid #1c2e1c;
+.dpanels{
+  display:grid;grid-template-columns:1fr 1.1fr .9fr;
+  background:rgba(212,255,30,.06);gap:1px;
 }
-.d-panel {
-  background: #0f1a0d; padding: 20px 22px;
-  position: relative; overflow: hidden;
+.dp{background:var(--coal);padding:22px 24px;position:relative;overflow:hidden;}
+.dp::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,255,30,.3) 40%,rgba(212,255,30,.6) 60%,transparent);
 }
-.d-panel::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(92,191,42,0.4) 40%, rgba(168,224,112,0.7) 60%, transparent);
+.dp-tag{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;}
+.dp-title{font-family:var(--mono);font-size:12px;color:var(--phos);letter-spacing:1px;margin-bottom:14px;}
+.dp-badge{
+  float:right;font-family:var(--mono);font-size:8px;
+  color:var(--phos);background:rgba(212,255,30,.07);
+  border:1px solid rgba(212,255,30,.2);padding:2px 9px;border-radius:1px;
+  letter-spacing:1px;margin-top:-18px;
+  animation:badgePulse 3s infinite;
 }
-.d-ptag { font-family: var(--mono); font-size: 8px; color: #4a6040; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; }
-.d-ptitle { font-family: var(--mono); font-size: 12px; color: var(--lime); letter-spacing: 1px; font-weight: 500; margin-bottom: 14px; }
-.d-pbadge {
-  float: right; font-family: var(--mono); font-size: 8px;
-  background: rgba(92,191,42,0.1); color: var(--lime);
-  border: 1px solid rgba(92,191,42,0.3); padding: 2px 8px; border-radius: 10px;
-  letter-spacing: 1px; margin-top: -18px;
-}
-.d-pbadge.blue { color: #4fc3f7; background: rgba(79,195,247,0.08); border-color: rgba(79,195,247,0.25); }
-
-/* canvas voxel */
-.d-cvx { background: #070e07; border: 1px solid #1c2e1c; border-radius: 4px; margin-bottom: 12px; position: relative; overflow: hidden; }
-.d-cvx canvas { display: block; width: 100%; }
-.d-scanline { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg,transparent,rgba(92,191,42,.5),transparent); animation: scanmv 2.8s ease-in-out infinite; pointer-events: none; }
-@keyframes scanmv { 0%{top:0}50%{top:calc(100% - 2px)}100%{top:0} }
-.d-cvx-lbl { position: absolute; bottom: 6px; left: 10px; font-family: var(--mono); font-size: 8px; color: #3a5a30; letter-spacing: 1px; }
-.d-cvx-coord { position: absolute; top: 6px; right: 10px; font-family: var(--mono); font-size: 8px; color: #3a5a30; }
-
-/* metrics */
-.d-mrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-.d-mcard { background: #0a110a; border: 1px solid #1c2e1c; border-radius: 4px; padding: 9px 11px; }
-.d-ml { font-family: var(--mono); font-size: 8px; color: #4a6040; letter-spacing: 1px; margin-bottom: 3px; text-transform: uppercase; }
-.d-mv { font-family: var(--mono); font-size: 20px; color: var(--lime); font-weight: 500; line-height: 1; }
-.d-mv small { font-size: 10px; color: #5a8050; margin-left: 2px; }
-.d-msub { font-family: var(--mono); font-size: 8px; color: #3a5030; margin-top: 3px; }
-
-/* bars */
-.d-bar { margin-bottom: 9px; }
-.d-bar-top { display: flex; justify-content: space-between; margin-bottom: 3px; }
-.d-bl { font-family: var(--mono); font-size: 8px; color: #4a6040; letter-spacing: .5px; }
-.d-bv { font-family: var(--mono); font-size: 9px; color: #7a9a70; }
-.d-bt { height: 4px; background: #131e12; border-radius: 2px; overflow: hidden; }
-.d-bf { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #3a6a1a, var(--lime)); box-shadow: 0 0 6px rgba(92,191,42,.2); transition: width .8s; }
-.d-bf.amb { background: linear-gradient(90deg, #7a4a00, var(--amber)); }
-
-/* container svg */
-.d-container { background: #070e07; border: 1px solid #1c2e1c; border-radius: 4px; padding: 10px; margin-bottom: 10px; }
-
-/* live grid */
-.d-lgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 10px; }
-.d-lcard { background: #0a110a; border: 1px solid #1c2e1c; border-radius: 4px; padding: 9px 11px; position: relative; }
-.d-lcard::after { content: '●'; position: absolute; top: 7px; right: 9px; font-size: 7px; color: var(--lime); animation: blink 1.5s infinite; }
-.d-ll { font-family: var(--mono); font-size: 8px; color: #4a6040; letter-spacing: .5px; text-transform: uppercase; margin-bottom: 3px; }
-.d-lv { font-family: var(--mono); font-size: 22px; color: var(--lime); font-weight: 500; line-height: 1; }
-.d-lu { font-family: var(--mono); font-size: 9px; color: #4a7040; margin-left: 2px; }
-.d-lt { font-family: var(--mono); font-size: 8px; color: #3a5030; margin-top: 4px; }
-.d-lt.up { color: #5a8a30; } .d-lt.dn { color: #8a6020; }
-.d-spark { display: block; margin-top: 5px; overflow: visible; }
-
+@keyframes badgePulse{0%,100%{opacity:1}50%{opacity:.6}}
+.dp-badge.bl{color:var(--blue);background:rgba(96,165,250,.07);border-color:rgba(96,165,250,.2);}
+ 
+/* voxel canvas */
+.dcvx{background:#070605;border:1px solid rgba(212,255,30,.08);border-radius:2px;margin-bottom:12px;position:relative;overflow:hidden;}
+.dcvx canvas{display:block;width:100%;}
+.dscanline{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(212,255,30,.5),transparent);animation:scanmv 3s ease-in-out infinite;pointer-events:none;}
+@keyframes scanmv{0%{top:0;opacity:.7}50%{top:calc(100% - 2px);opacity:.9}100%{top:0;opacity:.7}}
+.dcvx-lbl{position:absolute;bottom:6px;left:10px;font-family:var(--mono);font-size:7px;color:rgba(212,255,30,.25);letter-spacing:1px;}
+.dcvx-coord{position:absolute;top:6px;right:10px;font-family:var(--mono);font-size:7px;color:rgba(212,255,30,.25);}
+ 
+/* dash metrics */
+.dmrow{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
+.dmc{background:#0d0c09;border:1px solid rgba(212,255,30,.07);border-radius:2px;padding:10px 12px;}
+.dml{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.dmv{font-family:var(--mono);font-size:20px;color:var(--phos);line-height:1;}
+.dmv small{font-size:10px;color:var(--phos3);margin-left:2px;}
+.dms{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.2);margin-top:3px;}
+ 
+.dbar{margin-bottom:8px;}
+.dbar-top{display:flex;justify-content:space-between;margin-bottom:3px;}
+.dbl{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.3);letter-spacing:.5px;}
+.dbv{font-family:var(--mono);font-size:9px;color:rgba(212,255,30,.5);}
+.dbt{height:3px;background:rgba(212,255,30,.05);border-radius:2px;overflow:hidden;}
+.dbf{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--phos3),var(--phos));transition:width .9s cubic-bezier(.22,1,.36,1);}
+.dbf.amb{background:linear-gradient(90deg,#854d0e,var(--amber));}
+ 
+/* container svg box */
+.dcont{background:#070605;border:1px solid rgba(212,255,30,.07);border-radius:2px;padding:10px;margin-bottom:10px;}
+ 
+/* live cards */
+.dlgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
+.dlc{background:#0d0c09;border:1px solid rgba(212,255,30,.07);border-radius:2px;padding:10px 12px;position:relative;}
+.dlc::after{content:'●';position:absolute;top:8px;right:9px;font-size:7px;color:var(--phos);animation:blink 1.6s infinite;}
+.dll{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+.dlv{font-family:var(--mono);font-size:22px;color:var(--phos);line-height:1;}
+.dlu{font-family:var(--mono);font-size:9px;color:var(--phos3);margin-left:2px;}
+.dlt{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.2);margin-top:4px;}
+.dlt.up{color:rgba(212,255,30,.5);}
+.dlt.dn{color:rgba(245,158,11,.5);}
+.dspk{display:block;margin-top:5px;overflow:visible;}
+ 
 /* iot nodes */
-.d-iot { background: #0a110a; border: 1px solid #1c2e1c; border-radius: 4px; padding: 9px 12px; }
-.d-iot-t { font-family: var(--mono); font-size: 8px; color: #4a6040; letter-spacing: 1.5px; margin-bottom: 8px; }
-.d-nodes { display: flex; align-items: center; }
-.d-node { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
-.d-nbox { width: 26px; height: 26px; border: 1px solid #2a4a20; border-radius: 4px; background: rgba(92,191,42,.05); display: flex; align-items: center; justify-content: center; font-size: 12px; position: relative; }
-.d-npulse { position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 5px var(--lime); animation: blink 2s infinite; }
-.d-nl { font-family: var(--mono); font-size: 7px; color: #3a5030; text-align: center; line-height: 1.3; }
-.d-nline { flex: 1; height: 1px; background: linear-gradient(90deg,#2a4a20,#1a2e18); }
-
+.diot{background:#0d0c09;border:1px solid rgba(212,255,30,.07);border-radius:2px;padding:10px 12px;}
+.diot-t{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.25);letter-spacing:1.5px;margin-bottom:8px;}
+.dnodes{display:flex;align-items:center;}
+.dnode{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
+.dnbox{width:26px;height:26px;border:1px solid rgba(212,255,30,.15);border-radius:2px;background:rgba(212,255,30,.04);display:flex;align-items:center;justify-content:center;font-size:12px;position:relative;}
+.dnpulse{position:absolute;top:-3px;right:-3px;width:7px;height:7px;border-radius:50%;background:var(--phos);box-shadow:0 0 6px var(--phos);animation:blink 2s infinite;}
+.dnl{font-family:var(--mono);font-size:7px;color:rgba(212,255,30,.25);text-align:center;line-height:1.3;}
+.dnline{flex:1;height:1px;background:rgba(212,255,30,.08);}
+ 
 /* block c */
-.d-sbox { display: flex; justify-content: space-between; align-items: center; background: #0a110a; border: 1px solid #1c2e1c; border-radius: 4px; padding: 12px 14px; margin-bottom: 10px; }
-.d-sbig { font-family: var(--mono); font-size: 36px; font-weight: 500; color: var(--lime); line-height: 1; }
-.d-sbig small { font-size: 14px; color: #5a8050; margin-left: 3px; }
-.d-stgt { text-align: right; }
-.d-stgt-l { font-family: var(--mono); font-size: 8px; color: #4a6040; letter-spacing: 1px; }
-.d-stgt-v { font-family: var(--mono); font-size: 15px; color: #7a9a70; }
-.d-stgt-d { font-family: var(--mono); font-size: 10px; color: #5a8a30; margin-top: 2px; }
-
-.d-chart { background: #070e07; border: 1px solid #1c2e1c; border-radius: 4px; padding: 8px; margin-bottom: 10px; height: 100px; }
-
-.d-recipe { background: #0a110a; border: 1px solid #1c2e1c; border-radius: 4px; padding: 10px 13px; margin-bottom: 10px; }
-.d-rt { font-family: var(--mono); font-size: 8px; color: #4a6040; letter-spacing: 2px; margin-bottom: 10px; }
-.d-srow { margin-bottom: 10px; }
-.d-sh { display: flex; justify-content: space-between; margin-bottom: 5px; }
-.d-sn { font-family: var(--ui); font-size: 12px; font-weight: 600; color: #8aa080; }
-.d-sc { font-family: var(--mono); font-size: 9px; color: #4a6040; }
-.d-sv { font-family: var(--mono); font-size: 13px; color: var(--lime); font-weight: 500; }
-.d-sv.neg { color: var(--amber); }
-.d-strk { position: relative; height: 6px; background: #131e12; border-radius: 3px; }
-.d-sfill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,#3a6a1a,var(--lime)); box-shadow: 0 0 6px rgba(92,191,42,.2); transition: width .6s; }
-.d-sfill.neg { background: linear-gradient(90deg,#7a4a00,var(--amber)); }
-.d-sthumb { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 11px; height: 11px; border-radius: 50%; background: var(--lime); border: 2px solid #0f1a0d; box-shadow: 0 0 6px rgba(92,191,42,.5); transition: left .6s; }
-.d-sthumb.neg { background: var(--amber); box-shadow: 0 0 6px rgba(232,144,10,.5); }
-
-.d-log { background: #070e07; border: 1px solid #1c2e1c; border-radius: 4px; padding: 9px 11px; max-height: 140px; overflow-y: auto; }
-.d-log-t { font-family: var(--mono); font-size: 8px; color: #4a6040; letter-spacing: 1px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-.d-ai-tag { background: rgba(92,191,42,.08); color: var(--lime); border: 1px solid rgba(92,191,42,.25); padding: 1px 6px; font-size: 7px; border-radius: 8px; }
-.d-le { display: flex; gap: 8px; padding: 3.5px 0; border-bottom: 1px solid rgba(255,255,255,.03); animation: fadeup .3s ease; }
-@keyframes fadeup { from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none} }
-.d-ts { font-family: var(--mono); font-size: 8px; color: #3a5030; flex-shrink: 0; }
-.d-tm { font-family: var(--mono); font-size: 8px; color: #6a8a60; line-height: 1.4; }
-.d-tm.g { color: var(--lime); } .d-tm.w { color: var(--amber); }
-.d-log::-webkit-scrollbar { width: 2px; } .d-log::-webkit-scrollbar-thumb { background: #2a3a2a; }
-
+.dsbox{display:flex;justify-content:space-between;align-items:center;background:#0d0c09;border:1px solid rgba(212,255,30,.07);border-radius:2px;padding:14px 16px;margin-bottom:10px;}
+.dsbig{font-family:var(--mono);font-size:38px;color:var(--phos);line-height:1;text-shadow:0 0 24px rgba(212,255,30,.2);}
+.dsbig small{font-size:14px;color:var(--phos3);margin-left:3px;}
+.dstgt{text-align:right;}
+.dstgt-l{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.25);letter-spacing:1px;}
+.dstgt-v{font-family:var(--mono);font-size:16px;color:rgba(240,235,224,.5);}
+.dstgt-d{font-family:var(--mono);font-size:10px;color:rgba(212,255,30,.6);margin-top:2px;}
+ 
+.dchart{background:#070605;border:1px solid rgba(212,255,30,.07);border-radius:2px;padding:8px;margin-bottom:10px;height:98px;}
+ 
+.drecipe{background:#0d0c09;border:1px solid rgba(212,255,30,.07);border-radius:2px;padding:12px 14px;margin-bottom:10px;}
+.drt{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.25);letter-spacing:2px;margin-bottom:10px;}
+.dsrow{margin-bottom:10px;}
+.dsh{display:flex;justify-content:space-between;margin-bottom:5px;}
+.dsn{font-family:var(--hd);font-size:12px;font-weight:600;color:rgba(240,235,224,.6);}
+.dsc{font-family:var(--mono);font-size:9px;color:rgba(212,255,30,.25);}
+.dsv{font-family:var(--mono);font-size:13px;color:var(--phos);}
+.dsv.neg{color:var(--amber);}
+.dstrk{position:relative;height:5px;background:rgba(212,255,30,.05);border-radius:3px;}
+.dsfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--phos3),var(--phos));box-shadow:0 0 8px rgba(212,255,30,.15);transition:width .7s cubic-bezier(.22,1,.36,1);}
+.dsfill.neg{background:linear-gradient(90deg,#854d0e,var(--amber));}
+.dsthumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:11px;height:11px;border-radius:50%;background:var(--phos);border:2px solid var(--coal);box-shadow:0 0 8px rgba(212,255,30,.4);transition:left .7s cubic-bezier(.22,1,.36,1);}
+.dsthumb.neg{background:var(--amber);box-shadow:0 0 8px rgba(245,158,11,.4);}
+ 
+.dlog{background:#070605;border:1px solid rgba(212,255,30,.07);border-radius:2px;padding:10px 12px;max-height:138px;overflow-y:auto;}
+.dlog-t{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.25);letter-spacing:1.5px;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.dai-tag{background:rgba(212,255,30,.07);color:var(--phos);border:1px solid rgba(212,255,30,.2);padding:1px 6px;font-size:7px;border-radius:1px;}
+.dle{display:flex;gap:8px;padding:3.5px 0;border-bottom:1px solid rgba(212,255,30,.03);animation:fadeUp .35s ease;}
+.dts{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.2);flex-shrink:0;}
+.dtm{font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.45);line-height:1.4;}
+.dtm.g{color:var(--phos);}
+.dtm.w{color:var(--amber);}
+.dlog::-webkit-scrollbar{width:2px;}
+.dlog::-webkit-scrollbar-thumb{background:rgba(212,255,30,.15);}
+ 
 /* dash footer */
-.dash-footer {
-  background: #0a120a; border-top: 1px solid #1c2e1c;
-  padding: 16px 40px;
-  display: flex; align-items: center; justify-content: space-between;
-  font-family: var(--mono); font-size: 9px; color: #3a5030; letter-spacing: 1px;
+.dash-foot{
+  background:#0d0c09;border-top:1px solid rgba(212,255,30,.07);
+  padding:14px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:9px;color:rgba(212,255,30,.2);letter-spacing:1px;
 }
-.dash-footer-items { display: flex; gap: 32px; }
-.df-item span:last-child { color: #5a7a50; margin-left: 6px; }
-
-/* === ROADMAP === */
-.roadmap { max-width: 720px; }
-.rm-item { display: flex; gap: 28px; padding: 32px 0; border-bottom: 1px solid var(--border); }
-.rm-item:first-child { padding-top: 0; }
-.rm-left { flex-shrink: 0; width: 90px; }
-.rm-phase { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
-.rm-time { font-family: var(--mono); font-size: 11px; color: var(--text2); }
-.rm-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--border2); border: 2px solid var(--border); margin-top: 8px; }
-.rm-dot.now { background: var(--lime); border-color: var(--lime-l); box-shadow: 0 0 10px var(--lime-glow); animation: blink 2s infinite; }
-.rm-title { font-family: var(--hd); font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
-.rm-desc { font-size: 14px; color: var(--text2); line-height: 1.75; }
-.rm-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-.rm-tag { font-family: var(--mono); font-size: 9px; color: var(--text3); border: 1px solid var(--border); padding: 3px 10px; border-radius: 10px; }
-.rm-done { color: var(--lime-d); border-color: var(--lime-l); background: var(--lime-bg); }
-
-/* === HOW IT HELPS === */
-.help-list { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 960px; }
-.hl { display: flex; gap: 20px; }
-.hl-icon { width: 52px; height: 52px; flex-shrink: 0; border-radius: var(--r2); background: var(--lime-bg); border: 1px solid var(--lime-l); display: flex; align-items: center; justify-content: center; font-size: 24px; }
-.hl-title { font-family: var(--hd); font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
-.hl-desc { font-size: 13px; color: var(--text2); line-height: 1.75; }
-
-/* === FOOTER === */
-footer {
-  background: var(--ink); color: #5a7050;
-  padding: 48px 40px;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 20px;
+.df-items{display:flex;gap:32px;}
+.df-item span+span{color:rgba(212,255,30,.35);margin-left:6px;}
+ 
+/* scale */
+.dscale-bar{height:6px;border-radius:2px;background:linear-gradient(90deg,#0c1a04,#2a5010,#5a9a20,#a8d840,var(--phos),#f0cc00,#e07000);margin:5px 0;}
+.dscale-lbls{display:flex;justify-content:space-between;}
+.dscale-l{font-family:var(--mono);font-size:7px;color:rgba(212,255,30,.2);}
+ 
+/* ── ROADMAP ── */
+.roadmap{max-width:740px;}
+.rm-item{display:flex;gap:32px;padding:36px 0;border-bottom:1px solid rgba(212,255,30,.07);transition:background .3s;}
+.rm-item:first-child{padding-top:0;}
+.rm-left{flex-shrink:0;width:96px;}
+.rm-phase{font-family:var(--mono);font-size:9px;color:rgba(212,255,30,.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+.rm-time{font-family:var(--mono);font-size:11px;color:var(--cream3);}
+.rm-dot{width:12px;height:12px;border-radius:50%;background:var(--coal4);border:2px solid rgba(212,255,30,.15);margin-top:10px;transition:all .3s;}
+.rm-dot.now{background:var(--phos);border-color:rgba(212,255,30,.5);box-shadow:0 0 14px rgba(212,255,30,.3);animation:pulseDot 2s infinite;}
+.rm-title{font-family:var(--hd);font-size:19px;font-weight:700;color:var(--cream);margin-bottom:10px;letter-spacing:-.3px;}
+.rm-desc{font-size:14px;color:var(--cream3);line-height:1.8;}
+.rm-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.rm-tag{font-family:var(--mono);font-size:9px;color:rgba(212,255,30,.3);border:1px solid rgba(212,255,30,.1);padding:3px 10px;border-radius:1px;letter-spacing:.5px;}
+.rm-tag.done{color:var(--phos);border-color:rgba(212,255,30,.3);background:rgba(212,255,30,.05);}
+ 
+/* ── WHY ── */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:960px;}
+.why-item{display:flex;gap:22px;}
+.why-icon{width:52px;height:52px;flex-shrink:0;border-radius:4px;background:rgba(212,255,30,.06);border:1px solid rgba(212,255,30,.12);display:flex;align-items:center;justify-content:center;font-size:24px;transition:all .3s;}
+.why-item:hover .why-icon{background:rgba(212,255,30,.1);border-color:rgba(212,255,30,.25);transform:rotate(-4deg);}
+.why-title{font-family:var(--hd);font-size:16px;font-weight:700;color:var(--cream);margin-bottom:8px;}
+.why-desc{font-size:13px;color:var(--cream3);line-height:1.8;}
+ 
+/* ── FOOTER ── */
+footer{
+  background:#0d0c09;border-top:1px solid rgba(212,255,30,.08);
+  padding:48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;
 }
-.f-brand { font-family: var(--hd); font-size: 16px; font-weight: 800; color: white; }
-.f-brand em { color: var(--lime); font-style: normal; }
-.f-copy { font-family: var(--mono); font-size: 10px; color: #3a5030; letter-spacing: 1px; }
-.f-links { display: flex; gap: 24px; }
-.f-links a { font-size: 12px; color: #5a7050; text-decoration: none; transition: color .2s; }
-.f-links a:hover { color: var(--lime); }
-
-/* === REVEAL ANIM === */
-.rv { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
-.rv.in { opacity: 1; transform: none; }
-.rv-2 { transition-delay: .12s; }
-.rv-3 { transition-delay: .24s; }
-
-@media (max-width: 900px) {
-  .nav-links { display: none; }
-  .hero { grid-template-columns: 1fr; padding: 70px 20px 60px; gap: 40px; }
-  .hero-visual { display: none; }
-  .section { padding: 60px 20px; }
-  .tech-grid, .help-list, .problem-grid { grid-template-columns: 1fr; }
-  .numbers-row { grid-template-columns: 1fr 1fr; }
-  .flow-wrap { flex-direction: column; }
-  .flow-step:not(:last-child)::after { display:none; }
-  .flow-step { border-left: 1px solid var(--border) !important; border-top: none; }
-  .flow-step:first-child { border-radius: var(--r) var(--r) 0 0; }
-  .flow-step:last-child  { border-radius: 0 0 var(--r) var(--r); }
-  .dash-header { padding: 40px 20px 24px; }
-  .d-panels { grid-template-columns: 1fr; }
-  footer { padding: 32px 20px; }
+.f-brand{font-family:var(--hd);font-size:18px;font-weight:800;color:var(--cream);letter-spacing:-.3px;}
+.f-brand em{color:var(--phos);font-style:normal;}
+.f-links{display:flex;gap:28px;}
+.f-links a{font-size:12px;color:rgba(240,235,224,.3);text-decoration:none;transition:color .2s;font-family:var(--mono);letter-spacing:.5px;}
+.f-links a:hover{color:var(--phos);}
+.f-copy{font-family:var(--mono);font-size:10px;color:rgba(212,255,30,.2);letter-spacing:1px;}
+ 
+@media(max-width:900px){
+  .nav{padding:0 20px;}.nav-links{display:none;}
+  .hero,.s{padding:80px 20px 60px;}
+  .tgrid,.why-grid,.pgrid{grid-template-columns:1fr;}
+  .numgrid{grid-template-columns:1fr 1fr;}
+  .flow{flex-direction:column;}
+  .fstep{border-left:1px solid var(--border)!important;border-top:none;}
+  .arrow-between{display:none;}
+  .dpanels{grid-template-columns:1fr;}
+  footer{padding:32px 20px;}
+  .dash-hdr{padding:40px 20px 24px;}
+  .dtop,.dash-foot{padding:0 20px;}
 }
 </style>
 </head>
 <body>
-
-<!-- ─── NAV ─── -->
+ 
+<div class="cursor-glow" id="cursorGlow"></div>
+ 
+<!-- NAV -->
 <nav class="nav">
-  <div class="nav-brand">NOMAD<em>-M</em></div>
+  <div class="nav-brand">NOMAD<div class="nav-brand-dot"></div>M</div>
   <div class="nav-links">
     <a href="#problem">Проблема</a>
     <a href="#solution">Решение</a>
@@ -520,621 +566,522 @@ footer {
   </div>
   <button class="nav-btn" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">Смотреть систему</button>
 </nav>
-
-<!-- ─── HERO ─── -->
-<section style="background:var(--ground);border-bottom:1px solid var(--border)">
-  <div class="hero">
-    <div class="hero-content">
-      <div class="hero-eyebrow">Climate-Tech · Казахстан · 2024</div>
-      <h1 class="hero h1">Промышленные<br>отходы превращаются<br>в <mark>удобрения</mark>.</h1>
-      <p class="hero-lead">
-        NOMAD-M — мобильный завод в одном контейнере. Приезжает к отвалу, 
-        сканирует его дроном, сам подбирает рецепт и выпускает гранулы — 
-        без участия человека.
-      </p>
-      <div class="hero-actions">
-        <button class="btn-main" onclick="document.getElementById('solution').scrollIntoView({behavior:'smooth'})">Как это работает</button>
-        <button class="btn-sec" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">Смотреть систему управления →</button>
-      </div>
-      <div class="hero-stats">
-        <div class="hstat"><div class="hstat-n">14 TPH</div><div class="hstat-l">Скорость переработки</div></div>
-        <div class="hstat"><div class="hstat-n">98.4%</div><div class="hstat-l">Точность БПЛА-сканирования</div></div>
-        <div class="hstat"><div class="hstat-n">6.2 MPa</div><div class="hstat-l">Прочность гранулы</div></div>
-      </div>
+ 
+<!-- HERO -->
+<section class="hero">
+  <canvas class="hero-canvas" id="heroParticles"></canvas>
+  <div class="hero-inner">
+    <div class="hero-tag">Climate-Tech · Казахстан · 2024</div>
+    <h1 class="hero-h1">
+      Промышленные<br>
+      отходы становятся<br>
+      <span class="phos">удобрением.</span><br>
+      <span class="line2">Автоматически.</span>
+    </h1>
+    <p class="hero-sub">NOMAD-M — мобильный завод в контейнере. Дрон сканирует отвал, ИИ подбирает рецепт, линия выпускает гранулы. Без участия человека.</p>
+    <div class="hero-actions">
+      <button class="btn-phos" onclick="document.getElementById('solution').scrollIntoView({behavior:'smooth'})">Как это работает</button>
+      <button class="btn-ghost" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">Смотреть систему управления →</button>
     </div>
-    <div class="hero-visual">
-      <div class="scan-badge">▶ SCAN ACTIVE</div>
-      <div class="hero-vis-header">
-        <div class="hero-vis-title">NOMAD-CORE // LIVE</div>
-        <div class="hero-vis-dots">
-          <div class="hero-vis-dot" style="background:#2d4a2d"></div>
-          <div class="hero-vis-dot" style="background:#3a6a1a"></div>
-          <div class="hero-vis-dot" style="background:#5cbf2a"></div>
-        </div>
-      </div>
-      <div class="hero-vis-body">
-        <canvas id="heroCanvas" height="180" style="border-radius:4px"></canvas>
-      </div>
-      <div class="hero-vis-foot">
-        <div class="vis-stat"><div class="vis-stat-v" id="hAcc">98.4%</div><div class="vis-stat-l">Точность скан.</div></div>
-        <div class="vis-stat"><div class="vis-stat-v" id="hMpa">5.9 MPa</div><div class="vis-stat-l">Прочность</div></div>
-        <div class="vis-stat"><div class="vis-stat-v" id="hHum">22.8%</div><div class="vis-stat-l">Влажность</div></div>
-      </div>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-n" data-count="14" data-suffix=" TPH">14 TPH</div><div class="hs-l">Скорость переработки</div></div>
+      <div class="hs"><div class="hs-n" data-count="98.4" data-suffix="%">98.4%</div><div class="hs-l">Точность БПЛА-сканирования</div></div>
+      <div class="hs"><div class="hs-n" data-count="6.2" data-suffix=" MPa">6.2 MPa</div><div class="hs-l">Прочность гранулы</div></div>
     </div>
   </div>
 </section>
-
-<!-- ─── PROBLEM ─── -->
-<section id="problem" class="section section-alt">
-  <div class="section-inner">
+ 
+<!-- PROBLEM -->
+<section id="problem" class="s">
+  <div class="s-inner">
     <div class="eyebrow rv">Проблема</div>
-    <h2 class="section-title rv">Миллионы тонн отходов — <em>и никто их не перерабатывает</em></h2>
-    <p class="section-lead rv">Фосфогипс и золошлаки накапливаются на отвалах десятилетиями. Это не просто некрасиво — это дорого, токсично и юридически опасно.</p>
-    <div class="problem-grid rv">
-      <div class="prob-card">
-        <div class="prob-icon">🏔️</div>
-        <div class="prob-title">Горы отходов только растут</div>
-        <div class="prob-text">На каждую тонну произведённой фосфорной кислоты образуется 5 тонн фосфогипса. Эти отвалы занимают тысячи гектаров земли и никуда не деваются.</div>
-        <div class="prob-num">5:1</div>
-        <div class="prob-num-l">ТОНН ОТХОДОВ НА ТОННУ ПРОДУКТА</div>
+    <h2 class="sh2 rv">Миллионы тонн отходов —<br><em>и никто их не перерабатывает</em></h2>
+    <p class="s-lead rv">Фосфогипс и золошлаки копятся на отвалах десятилетиями. Это не просто некрасиво — дорого, токсично и юридически опасно.</p>
+    <div class="pgrid rv">
+      <div class="pcard">
+        <span class="pcard-ico">🏔️</span>
+        <div class="pcard-title">Горы отходов только растут</div>
+        <div class="pcard-text">На каждую тонну фосфорной кислоты — 5 тонн фосфогипса. Эти горы занимают тысячи гектаров и никуда не деваются.</div>
+        <div class="pcard-stat">5:1</div>
+        <div class="pcard-stat-l">ТОНН ОТХОДОВ НА ТОННУ ПРОДУКТА</div>
       </div>
-      <div class="prob-card">
-        <div class="prob-icon">☠️</div>
-        <div class="prob-title">Экологический и финансовый ущерб</div>
-        <div class="prob-text">Отвалы выщелачивают тяжёлые металлы в почву и грунтовые воды. Штрафы, рекультивация, судебные иски — для предприятия это десятки миллионов долларов.</div>
-        <div class="prob-num">$40M+</div>
-        <div class="prob-num-l">СТОИМОСТЬ РЕКУЛЬТИВАЦИИ ОДНОГО ОТВАЛА</div>
+      <div class="pcard">
+        <span class="pcard-ico">☠️</span>
+        <div class="pcard-title">Экологический и финансовый ущерб</div>
+        <div class="pcard-text">Тяжёлые металлы выщелачиваются в почву и воду. Штрафы и рекультивация обходятся предприятиям в десятки миллионов.</div>
+        <div class="pcard-stat">$40M+</div>
+        <div class="pcard-stat-l">СТОИМОСТЬ РЕКУЛЬТИВАЦИИ ОДНОГО ОТВАЛА</div>
       </div>
-      <div class="prob-card">
-        <div class="prob-icon">🏭</div>
-        <div class="prob-title">Старые решения не работают</div>
-        <div class="prob-text">Стационарный завод по переработке стоит от $50 млн и требует многолетнего строительства. Везти сырьё к заводу — нерентабельно. Никто этого не делает.</div>
-        <div class="prob-num">$50M+</div>
-        <div class="prob-num-l">СТОИМОСТЬ СТАЦИОНАРНОГО ЗАВОДА</div>
+      <div class="pcard">
+        <span class="pcard-ico">🏭</span>
+        <div class="pcard-title">Старые решения не работают</div>
+        <div class="pcard-text">Стационарный завод стоит от $50 млн и строится годами. Логистика сырья убивает экономику — никто этого не делает.</div>
+        <div class="pcard-stat">$50M+</div>
+        <div class="pcard-stat-l">СТОИМОСТЬ СТАЦИОНАРНОГО ЗАВОДА</div>
       </div>
-      <div class="prob-card">
-        <div class="prob-icon">📉</div>
-        <div class="prob-title">Нестабильное качество сырья</div>
-        <div class="prob-text">Влажность, плотность и химия отвала меняются каждый день и в каждой точке. Ручной контроль медленный, дорогой и даёт нестабильный продукт на выходе.</div>
-        <div class="prob-num">±40%</div>
-        <div class="prob-num-l">РАЗБРОС ВЛАЖНОСТИ СЫРЬЯ</div>
+      <div class="pcard">
+        <span class="pcard-ico">📉</span>
+        <div class="pcard-title">Нестабильное качество сырья</div>
+        <div class="pcard-text">Влажность и химия отвала меняются каждый день. Ручной контроль — медленно, дорого, нестабильный результат.</div>
+        <div class="pcard-stat">±40%</div>
+        <div class="pcard-stat-l">РАЗБРОС ВЛАЖНОСТИ СЫРЬЯ</div>
       </div>
     </div>
   </div>
 </section>
-
-<!-- ─── SOLUTION ─── -->
-<section id="solution" class="section">
-  <div class="section-inner">
+ 
+<!-- SOLUTION -->
+<section id="solution" class="s s-alt">
+  <div class="s-inner">
     <div class="eyebrow rv">Решение</div>
-    <h2 class="section-title rv">Мы привозим завод <em>к отвалу</em> — не наоборот</h2>
-    <p class="section-lead rv">Весь производственный цикл — от сканирования до готовой гранулы — в одном контейнере 40 футов. Разворачивается за 4 часа.</p>
-    <div class="flow-wrap rv">
-      <div class="flow-step">
-        <div class="flow-n">ШАГ 1</div>
-        <span class="flow-ico">🛸</span>
-        <div class="flow-title">БПЛА сканирует отвал</div>
-        <div class="flow-desc">Дрон строит 3D-карту поверхности. Показывает где взять сырьё с нужной влажностью.</div>
-        <div class="flow-data">✓ Точность 98.4% · RTK GPS</div>
+    <h2 class="sh2 rv">Мы привозим завод <em>к отвалу</em></h2>
+    <p class="s-lead rv">Весь производственный цикл в контейнере 40ft. Разворачивается за 4 часа. Сам выбирает сырьё, сам считает рецепт, сам выпускает продукт.</p>
+    <div class="flow rv">
+      <div class="fstep" style="position:relative">
+        <div class="fstep-n">ШАГ 1</div>
+        <span class="fstep-ico">🛸</span>
+        <div class="fstep-title">БПЛА сканирует отвал</div>
+        <div class="fstep-desc">Дрон строит 3D-карту — где взять сырьё с нужной влажностью.</div>
+        <div class="fstep-data">✓ 98.4% · RTK GPS</div>
+        <div class="arrow-between">→</div>
       </div>
-      <div class="flow-step">
-        <div class="flow-n">ШАГ 2</div>
-        <span class="flow-ico">📦</span>
-        <div class="flow-title">Сырьё в бункер</div>
-        <div class="flow-desc">Фосфогипс попадает в приёмный бункер. Датчик мгновенно замеряет влажность на входе.</div>
-        <div class="flow-data">✓ IoT-датчик S-01 · 22.8%</div>
+      <div class="fstep" style="position:relative">
+        <div class="fstep-n">ШАГ 2</div>
+        <span class="fstep-ico">📦</span>
+        <div class="fstep-title">Сырьё в бункер</div>
+        <div class="fstep-desc">IoT-датчик мгновенно замеряет влажность на входе.</div>
+        <div class="fstep-data">✓ Датчик S-01 · 22.8%</div>
+        <div class="arrow-between">→</div>
       </div>
-      <div class="flow-step">
-        <div class="flow-n">ШАГ 3</div>
-        <span class="flow-ico">🤖</span>
-        <div class="flow-title">ИИ рассчитывает рецепт</div>
-        <div class="flow-desc">Нейросеть берёт данные с БПЛА и датчиков и подбирает точные пропорции связующих.</div>
-        <div class="flow-data">✓ Гуматы +1.2% · Биочар −0.5%</div>
+      <div class="fstep" style="position:relative">
+        <div class="fstep-n">ШАГ 3</div>
+        <span class="fstep-ico">🤖</span>
+        <div class="fstep-title">ИИ рассчитывает рецепт</div>
+        <div class="fstep-desc">Нейросеть подбирает точные пропорции связующих в реальном времени.</div>
+        <div class="fstep-data">✓ Гуматы +1.2% · Биочар −0.5%</div>
+        <div class="arrow-between">→</div>
       </div>
-      <div class="flow-step">
-        <div class="flow-n">ШАГ 4</div>
-        <span class="flow-ico">⚙️</span>
-        <div class="flow-title">Гранулирование</div>
-        <div class="flow-desc">Смеситель → Гранулятор → Сушильный барабан. Полностью автоматический цикл.</div>
-        <div class="flow-data">✓ 14 TPH · Темп. 13°C</div>
+      <div class="fstep" style="position:relative">
+        <div class="fstep-n">ШАГ 4</div>
+        <span class="fstep-ico">⚙️</span>
+        <div class="fstep-title">Гранулирование</div>
+        <div class="fstep-desc">Смеситель → Гранулятор → Сушилка. Полностью автоматически.</div>
+        <div class="fstep-data">✓ 14 TPH · 13°C</div>
+        <div class="arrow-between">→</div>
       </div>
-      <div class="flow-step">
-        <div class="flow-n">ШАГ 5</div>
-        <span class="flow-ico">✅</span>
-        <div class="flow-title">Готовый продукт</div>
-        <div class="flow-desc">Гранула с гарантированной прочностью ≥6.2 MPa. Удобрение или стройматериал — на продажу.</div>
-        <div class="flow-data">✓ Прочность ≥ 6.2 MPa</div>
+      <div class="fstep">
+        <div class="fstep-n">ШАГ 5</div>
+        <span class="fstep-ico">✅</span>
+        <div class="fstep-title">Готовый продукт</div>
+        <div class="fstep-desc">Гранула с прочностью ≥6.2 MPa. Удобрение или стройматериал.</div>
+        <div class="fstep-data">✓ Прочность ≥ 6.2 MPa</div>
       </div>
     </div>
   </div>
 </section>
-
-<!-- ─── TECH ─── -->
-<section id="tech" class="section section-alt">
-  <div class="section-inner">
+ 
+<!-- TECH -->
+<section id="tech" class="s">
+  <div class="s-inner">
     <div class="eyebrow rv">Технология</div>
-    <h2 class="section-title rv">Три уровня контроля, <em>работающих вместе</em></h2>
-    <p class="section-lead rv">Система не просто мониторит — она сама реагирует на изменения и корректирует производство в реальном времени.</p>
-    <div class="tech-grid rv">
-      <div class="tech-card">
-        <div class="tech-card-top">🛸</div>
-        <div class="tech-tag">Блок А · Внешний контур</div>
-        <div class="tech-title">БПЛА-разведка</div>
-        <div class="tech-desc">Дрон облетает отвал перед каждым циклом и строит тепловую карту плотности и влажности. Система знает где брать сырьё ещё до того как начнётся подача.</div>
-        <div class="tech-metrics">
-          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Точность 3D-сканирования</span><span class="tmet-v" id="tm-acc">98.4%</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:98%"></div></div></div>
-          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Стабильность сигнала</span><span class="tmet-v">87%</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:87%"></div></div></div>
-          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Покрытие маршрута</span><span class="tmet-v">3 / 7</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:43%"></div></div></div>
+    <h2 class="sh2 rv">Три уровня контроля, <em>работающих вместе</em></h2>
+    <p class="s-lead rv">Система не просто мониторит — она сама реагирует и корректирует производство каждую секунду.</p>
+    <div class="tgrid rv">
+      <div class="tcard rv rv-d1">
+        <div class="tcard-icon">🛸</div>
+        <div class="tcard-tag">Блок А · Внешний контур</div>
+        <div class="tcard-title">БПЛА-разведка</div>
+        <div class="tcard-desc">Дрон облетает отвал перед каждым циклом и строит тепловую карту плотности и влажности. Система знает, где брать сырьё, ещё до начала подачи.</div>
+        <div class="tcard-metrics">
+          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Точность 3D-сканирования</span><span class="tmet-v" id="tm-acc">98.4%</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:0%" data-w="98"></div></div></div>
+          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Стабильность сигнала</span><span class="tmet-v">87%</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:0%" data-w="87"></div></div></div>
+          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Покрытие маршрута</span><span class="tmet-v">3/7</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:0%" data-w="43"></div></div></div>
         </div>
       </div>
-      <div class="tech-card">
-        <div class="tech-card-top">📡</div>
-        <div class="tech-tag">Блок Б · Внутренний контур</div>
-        <div class="tech-title">IoT-мониторинг линии</div>
-        <div class="tech-desc">Пять беспроводных датчиков на каждом узле контейнера — бункер, смеситель, гранулятор, сушилка. Данные поступают каждую секунду. Любое отклонение = мгновенный alert.</div>
-        <div class="tech-metrics">
-          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Влажность на входе</span><span class="tmet-v" id="tm-hum">22.8%</span></div><div class="tmet-bar"><div class="tmet-fill" id="tm-hum-bar" style="width:46%"></div></div></div>
-          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Скорость подачи</span><span class="tmet-v">14 TPH</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:70%"></div></div></div>
-          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Температура камеры</span><span class="tmet-v">13°C</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:55%"></div></div></div>
+      <div class="tcard rv rv-d2">
+        <div class="tcard-icon">📡</div>
+        <div class="tcard-tag">Блок Б · Внутренний контур</div>
+        <div class="tcard-title">IoT-мониторинг</div>
+        <div class="tcard-desc">Пять беспроводных датчиков на каждом узле — бункер, смеситель, гранулятор, сушилка. Данные каждую секунду. Любое отклонение = мгновенный alert.</div>
+        <div class="tcard-metrics">
+          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Влажность на входе</span><span class="tmet-v" id="tm-hum">22.8%</span></div><div class="tmet-bar"><div class="tmet-fill" id="tm-hum-bar" style="width:0%" data-w="46"></div></div></div>
+          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Скорость подачи</span><span class="tmet-v">14 TPH</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:0%" data-w="70"></div></div></div>
+          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Температура камеры</span><span class="tmet-v">13°C</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:0%" data-w="55"></div></div></div>
         </div>
       </div>
-      <div class="tech-card">
-        <div class="tech-card-top">🧠</div>
-        <div class="tech-tag">Блок В · AI-ядро</div>
-        <div class="tech-title">AI Formulation Control</div>
-        <div class="tech-desc">ИИ получает данные из обоих контуров и в реальном времени корректирует рецептуру. Пришло влажное сырьё? ИИ сам добавит больше связующего. Гранула всегда выйдет нужной прочности.</div>
-        <div class="tech-metrics">
-          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Прочность гранулы</span><span class="tmet-v" id="tm-mpa">5.9 MPa</span></div><div class="tmet-bar"><div class="tmet-fill" id="tm-mpa-bar" style="width:82%"></div></div></div>
-          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Binder A (гуматы)</span><span class="tmet-v">+1.2%</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:62%"></div></div></div>
-          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Точность ИИ-рецепта</span><span class="tmet-v">96.3%</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:96%"></div></div></div>
+      <div class="tcard rv rv-d3">
+        <div class="tcard-icon">🧠</div>
+        <div class="tcard-tag">Блок В · AI-ядро</div>
+        <div class="tcard-title">AI Formulation</div>
+        <div class="tcard-desc">ИИ получает данные из обоих контуров и в реальном времени корректирует рецептуру. Пришло влажное сырьё — ИИ сам добавит связующего. Гранула всегда нужной прочности.</div>
+        <div class="tcard-metrics">
+          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Прочность гранулы</span><span class="tmet-v" id="tm-mpa">5.9 MPa</span></div><div class="tmet-bar"><div class="tmet-fill" id="tm-mpa-bar" style="width:0%" data-w="82"></div></div></div>
+          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Binder A (гуматы)</span><span class="tmet-v">+1.2%</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:0%" data-w="62"></div></div></div>
+          <div class="tmet"><div class="tmet-row"><span class="tmet-l">Точность рецепта</span><span class="tmet-v">96.3%</span></div><div class="tmet-bar"><div class="tmet-fill" style="width:0%" data-w="96"></div></div></div>
         </div>
       </div>
     </div>
   </div>
 </section>
-
-<!-- ─── NUMBERS ─── -->
-<section class="section">
-  <div class="section-inner">
+ 
+<!-- NUMBERS -->
+<section class="s s-alt">
+  <div class="s-inner">
     <div class="eyebrow rv">Показатели</div>
-    <h2 class="section-title rv">Цифры, <em>которые имеют значение</em></h2>
-    <div class="numbers-row rv" style="margin-bottom:0">
-      <div class="num-card">
-        <div class="num-val">14<sup>TPH</sup></div>
-        <div class="num-label">Тонн сырья<br>перерабатывается в час</div>
-        <div class="num-sub">PRODUCTION RATE</div>
-      </div>
-      <div class="num-card">
-        <div class="num-val">98<sup>%</sup></div>
-        <div class="num-label">Точность<br>3D-сканирования БПЛА</div>
-        <div class="num-sub">SCAN ACCURACY</div>
-      </div>
-      <div class="num-card">
-        <div class="num-val">6.2<sup>MPa</sup></div>
-        <div class="num-label">Целевая прочность<br>готовой гранулы</div>
-        <div class="num-sub">GRANULE STRENGTH</div>
-      </div>
-      <div class="num-card">
-        <div class="num-val">5<sup>×</sup></div>
-        <div class="num-label">Дешевле стационарного<br>завода по переработке</div>
-        <div class="num-sub">COST ADVANTAGE</div>
-      </div>
+    <h2 class="sh2 rv">Цифры, <em>которые имеют значение</em></h2>
+    <div class="numgrid rv">
+      <div class="numcard"><div class="numcard-val"><span class="js-count" data-val="14">0</span><sup>TPH</sup></div><div class="numcard-l">Тонн сырья перерабатывается в час</div><div class="numcard-sub">PRODUCTION RATE</div></div>
+      <div class="numcard"><div class="numcard-val"><span class="js-count" data-val="98">0</span><sup>%</sup></div><div class="numcard-l">Точность 3D-сканирования БПЛА</div><div class="numcard-sub">SCAN ACCURACY</div></div>
+      <div class="numcard"><div class="numcard-val"><span class="js-count" data-val="6" data-dec=".2">0</span><sup>MPa</sup></div><div class="numcard-l">Целевая прочность готовой гранулы</div><div class="numcard-sub">GRANULE STRENGTH</div></div>
+      <div class="numcard"><div class="numcard-val"><span class="js-count" data-val="5">0</span><sup>×</sup></div><div class="numcard-l">Дешевле стационарного завода</div><div class="numcard-sub">COST ADVANTAGE</div></div>
     </div>
   </div>
 </section>
-
-<!-- ─── DASHBOARD ─── -->
-<section id="dashboard" class="dash-section">
-  <div class="dash-header">
-    <div class="dash-header-text">
-      <div class="dash-eyebrow">Система управления</div>
-      <div class="dash-title">NOMAD-Core —<br>интерфейс оператора</div>
-      <div class="dash-sub">Все три контура в одном экране. Данные обновляются каждую секунду.</div>
+ 
+<!-- DASHBOARD -->
+<section id="dashboard" class="dash-wrap">
+  <div class="dash-hdr">
+    <div>
+      <div class="dash-hdr-eyebrow">Система управления</div>
+      <div class="dash-hdr-title">NOMAD-Core —<br>интерфейс оператора</div>
+      <div class="dash-hdr-sub">Все три контура в одном экране. Данные обновляются каждую секунду.</div>
     </div>
-    <div class="dash-live-badge"><div class="live-dot"></div>LIVE DATA</div>
+    <div class="live-pill"><div class="live-dot"></div>LIVE DATA</div>
   </div>
-
-  <!-- topbar -->
-  <div class="d-topbar">
-    <div class="d-logo"><strong>NOMAD-CORE</strong> // CONTROL INTERFACE v2.4</div>
-    <div class="d-bar-status">
-      <div class="d-sitem"><div class="d-sdot g"></div>DRONE LINK</div>
-      <div class="d-sitem"><div class="d-sdot o"></div>IoT MESH</div>
-      <div class="d-sitem"><div class="d-sdot g"></div>AI ENGINE</div>
+  <div class="dtop">
+    <div class="dtop-logo"><strong>NOMAD-CORE</strong> // CONTROL INTERFACE v2.4</div>
+    <div class="dtop-status">
+      <div class="dsi"><div class="dsd g"></div>DRONE LINK</div>
+      <div class="dsi"><div class="dsd a"></div>IoT MESH</div>
+      <div class="dsi"><div class="dsd g"></div>AI ENGINE</div>
     </div>
-    <div class="d-clock" id="dashClock">--:--:--</div>
+    <div class="dtop-clk" id="dashClock">--:--:--</div>
   </div>
-
-  <!-- panels -->
-  <div class="d-panels">
-
-    <!-- PANEL A -->
-    <div class="d-panel">
-      <div class="d-ptag">Блок А · Внешний контур</div>
+ 
+  <div class="dpanels">
+    <!-- A -->
+    <div class="dp">
+      <div class="dp-tag">Блок А · Внешний контур</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div class="d-ptitle">БПЛА-РАЗВЕДКА</div>
-        <div class="d-pbadge">▶ ACTIVE</div>
+        <div class="dp-title">БПЛА-РАЗВЕДКА</div>
+        <div class="dp-badge">▶ ACTIVE</div>
       </div>
-      <div style="background:rgba(92,191,42,0.05);border:1px solid #1c2e1c;border-left:2px solid rgba(92,191,42,.3);padding:7px 11px;margin-bottom:11px;border-radius:3px;font-family:var(--mono);font-size:8px;color:#5a8050;display:flex;align-items:center;gap:7px">
-        <span style="width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 6px var(--lime);flex-shrink:0;animation:blink 1.5s infinite;display:inline-block"></span>
-        Маршрут 3/7 · Alt 42м · <strong style="color:var(--lime)">Активное сканирование</strong>
+      <div style="background:rgba(212,255,30,.04);border:1px solid rgba(212,255,30,.08);border-left:2px solid rgba(212,255,30,.25);padding:7px 11px;margin-bottom:11px;border-radius:2px;font-family:var(--mono);font-size:8px;color:rgba(212,255,30,.4);display:flex;align-items:center;gap:7px">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--phos);box-shadow:0 0 6px var(--phos);flex-shrink:0;animation:blink 1.5s infinite;display:inline-block"></span>
+        Маршрут 3/7 · Alt 42м · <strong style="color:var(--phos)">Активное сканирование</strong>
       </div>
-      <div class="d-cvx">
-        <canvas id="dashCanvas" height="150"></canvas>
-        <div class="d-scanline"></div>
-        <div class="d-cvx-coord">52.8°N / 69.4°E</div>
-        <div class="d-cvx-lbl">VOXEL MESH — ФОСФОГИПСОВЫЙ ОТВАЛ</div>
+      <div class="dcvx">
+        <canvas id="dashCanvas" height="148"></canvas>
+        <div class="dscanline"></div>
+        <div class="dcvx-coord">52.8°N / 69.4°E</div>
+        <div class="dcvx-lbl">VOXEL MESH — ФОСФОГИПСОВЫЙ ОТВАЛ</div>
       </div>
-      <div class="d-mrow">
-        <div class="d-mcard">
-          <div class="d-ml">3D ACCURACY</div>
-          <div class="d-mv" id="dAcc">98.4<small>%</small></div>
-          <div class="d-msub">↑ +0.2 last pass</div>
-        </div>
-        <div class="d-mcard">
-          <div class="d-ml">SIGNAL</div>
-          <div class="d-mv" id="dSig">94<small>%</small></div>
-          <div class="d-msub">RTK GPS · locked</div>
-        </div>
+      <div class="dmrow">
+        <div class="dmc"><div class="dml">3D ACCURACY</div><div class="dmv" id="dAcc">98.4<small>%</small></div><div class="dms">↑ +0.2 last pass</div></div>
+        <div class="dmc"><div class="dml">SIGNAL</div><div class="dmv" id="dSig">94<small>%</small></div><div class="dms">RTK GPS · locked</div></div>
       </div>
-      <div class="d-bar">
-        <div class="d-bar-top"><span class="d-bl">СТАБИЛЬНОСТЬ СИГНАЛА</span><span class="d-bv" id="dSigV">87%</span></div>
-        <div class="d-bt"><div class="d-bf" id="dSigB" style="width:87%"></div></div>
-      </div>
-      <div style="background:#070e07;border:1px solid #1c2e1c;border-radius:4px;padding:9px 11px;margin-top:6px">
-        <div style="font-family:var(--mono);font-size:7px;color:#3a5030;letter-spacing:2px;margin-bottom:5px">ШКАЛА ПЛОТНОСТЬ / ВЛАЖНОСТЬ</div>
-        <div style="height:6px;border-radius:2px;background:linear-gradient(90deg,#0e2208,#2a5010,#5a9a20,#a8e060,#f0c000,#e07000);margin-bottom:5px"></div>
-        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:7px;color:#3a5030;margin-bottom:8px"><span>LOW 0.8</span><span>MED</span><span>HIGH 1.9 g/cm³</span></div>
-        <div class="d-bar" style="margin-bottom:7px">
-          <div class="d-bar-top"><span class="d-bl">ПЛОТНОСТЬ ПОВЕРХНОСТИ</span><span class="d-bv" id="dDensV">1.42 g/cm³</span></div>
-          <div class="d-bt"><div class="d-bf" id="dDensB" style="width:60%"></div></div>
-        </div>
-        <div class="d-bar" style="margin-bottom:0">
-          <div class="d-bar-top"><span class="d-bl">ВЛАЖНОСТЬ ОТВАЛА</span><span class="d-bv" id="dMoistV">34.7%</span></div>
-          <div class="d-bt"><div class="d-bf amb" id="dMoistB" style="width:35%"></div></div>
+      <div class="dbar"><div class="dbar-top"><span class="dbl">СТАБИЛЬНОСТЬ СИГНАЛА</span><span class="dbv" id="dSigV">87%</span></div><div class="dbt"><div class="dbf" id="dSigB" style="width:87%"></div></div></div>
+      <div style="background:#070605;border:1px solid rgba(212,255,30,.07);border-radius:2px;padding:9px 11px;margin-top:6px">
+        <div style="font-family:var(--mono);font-size:7px;color:rgba(212,255,30,.2);letter-spacing:2px;margin-bottom:5px">ШКАЛА ПЛОТНОСТЬ / ВЛАЖНОСТЬ</div>
+        <div class="dscale-bar"></div>
+        <div class="dscale-lbls"><span class="dscale-l">LOW 0.8</span><span class="dscale-l">MED</span><span class="dscale-l">HIGH 1.9 g/cm³</span></div>
+        <div style="margin-top:8px">
+          <div class="dbar" style="margin-bottom:7px"><div class="dbar-top"><span class="dbl">ПЛОТНОСТЬ ПОВЕРХНОСТИ</span><span class="dbv" id="dDensV">1.42 g/cm³</span></div><div class="dbt"><div class="dbf" id="dDensB" style="width:60%"></div></div></div>
+          <div class="dbar" style="margin-bottom:0"><div class="dbar-top"><span class="dbl">ВЛАЖНОСТЬ ОТВАЛА</span><span class="dbv" id="dMoistV">34.7%</span></div><div class="dbt"><div class="dbf amb" id="dMoistB" style="width:35%"></div></div></div>
         </div>
       </div>
     </div>
-
-    <!-- PANEL B -->
-    <div class="d-panel">
-      <div class="d-ptag">Блок Б · Внутренний контур</div>
+ 
+    <!-- B -->
+    <div class="dp">
+      <div class="dp-tag">Блок Б · Внутренний контур</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div class="d-ptitle">IoT-МОНИТОРИНГ ЛИНИИ</div>
-        <div class="d-pbadge">● ONLINE</div>
+        <div class="dp-title">IoT-МОНИТОРИНГ ЛИНИИ</div>
+        <div class="dp-badge">● ONLINE</div>
       </div>
-      <div class="d-container">
+      <div class="dcont">
         <svg viewBox="0 0 420 116" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
-          <rect x="5" y="12" width="410" height="90" rx="3" fill="rgba(92,191,42,0.02)" stroke="#1c2e1c" stroke-width="1.5"/>
-          <line x1="108" y1="12" x2="108" y2="102" stroke="#1c2e1c" stroke-width="1"/>
-          <line x1="212" y1="12" x2="212" y2="102" stroke="#1c2e1c" stroke-width="1"/>
-          <line x1="316" y1="12" x2="316" y2="102" stroke="#1c2e1c" stroke-width="1"/>
-          <defs><marker id="ar" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto"><path d="M0,0L5,2.5L0,5Z" fill="#3a6a1a"/></marker></defs>
-          <path d="M108 57 L120 57" stroke="#3a6a1a" stroke-width="1.5" marker-end="url(#ar)"/>
-          <path d="M212 57 L224 57" stroke="#3a6a1a" stroke-width="1.5" marker-end="url(#ar)"/>
-          <path d="M316 57 L328 57" stroke="#3a6a1a" stroke-width="1.5" marker-end="url(#ar)"/>
-          <path d="M20 24 L88 24 L84 84 L24 84 Z" fill="none" stroke="#3a6a1a" stroke-width="1.5"/>
-          <rect x="16" y="16" width="72" height="10" fill="#0a110a" rx="1"/>
-          <circle cx="80" cy="16" r="5" fill="#0a110a" stroke="#5cbf2a" stroke-width="1"/><circle cx="80" cy="16" r="2.5" fill="#5cbf2a"/>
-          <text x="54" y="102" fill="#3a5030" font-family="JetBrains Mono,monospace" font-size="7" text-anchor="middle">БУНКЕР</text>
-          <circle cx="160" cy="56" r="22" fill="none" stroke="#3a6a1a" stroke-width="1.5"/>
-          <line x1="160" y1="56" x2="160" y2="36" stroke="#5cbf2a" stroke-width="1.5" id="mxArm" style="transform-origin:160px 56px;animation:spin 2.2s linear infinite"/>
-          <circle cx="160" cy="56" r="3.5" fill="#3a6a1a"/>
-          <circle cx="184" cy="22" r="5" fill="#0a110a" stroke="#5cbf2a" stroke-width="1"/><circle cx="184" cy="22" r="2.5" fill="#5cbf2a"/>
-          <text x="160" y="102" fill="#3a5030" font-family="JetBrains Mono,monospace" font-size="7" text-anchor="middle">СМЕСИТЕЛЬ</text>
-          <rect x="226" y="30" width="76" height="46" rx="2" fill="none" stroke="#3a6a1a" stroke-width="1.5"/>
-          <rect x="232" y="35" width="15" height="36" rx="1" fill="#0a110a"/><rect x="252" y="35" width="15" height="36" rx="1" fill="#0a110a"/><rect x="272" y="35" width="15" height="36" rx="1" fill="#0a110a"/>
-          <circle cx="239" cy="53" r="3.5" fill="#3a6a1a"/><circle cx="259" cy="48" r="3" fill="#3a6a1a"/><circle cx="259" cy="62" r="3.5" fill="#3a6a1a"/><circle cx="279" cy="55" r="3" fill="#3a6a1a"/>
-          <circle cx="293" cy="22" r="5" fill="#0a110a" stroke="#5cbf2a" stroke-width="1"/><circle cx="293" cy="22" r="2.5" fill="#5cbf2a"/>
-          <text x="264" y="102" fill="#3a5030" font-family="JetBrains Mono,monospace" font-size="7" text-anchor="middle">ГРАНУЛЯТОР</text>
-          <ellipse cx="371" cy="57" rx="30" ry="22" fill="none" stroke="#3a6a1a" stroke-width="1.5"/>
-          <path d="M349 49 Q357 41 365 49 Q373 57 381 49 Q389 41 396 49" fill="none" stroke="#e8900a" stroke-width="1.2" opacity=".7"/>
-          <path d="M349 62 Q357 54 365 62 Q373 70 381 62 Q389 54 396 62" fill="none" stroke="#e8900a" stroke-width="1" opacity=".4"/>
-          <circle cx="393" cy="20" r="5" fill="#0a110a" stroke="#5cbf2a" stroke-width="1"/><circle cx="393" cy="20" r="2.5" fill="#5cbf2a"/>
-          <text x="371" y="102" fill="#3a5030" font-family="JetBrains Mono,monospace" font-size="7" text-anchor="middle">СУШИЛКА</text>
-          <text x="6" y="9" fill="#3a5030" font-family="JetBrains Mono,monospace" font-size="6">← ВХОД</text>
-          <text x="360" y="9" fill="#3a5030" font-family="JetBrains Mono,monospace" font-size="6">ВЫХОД →</text>
+          <rect x="5" y="12" width="410" height="90" rx="3" fill="rgba(212,255,30,0.015)" stroke="rgba(212,255,30,0.1)" stroke-width="1.5"/>
+          <line x1="108" y1="12" x2="108" y2="102" stroke="rgba(212,255,30,0.08)" stroke-width="1"/>
+          <line x1="212" y1="12" x2="212" y2="102" stroke="rgba(212,255,30,0.08)" stroke-width="1"/>
+          <line x1="316" y1="12" x2="316" y2="102" stroke="rgba(212,255,30,0.08)" stroke-width="1"/>
+          <defs><marker id="ar" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto"><path d="M0,0L5,2.5L0,5Z" fill="rgba(212,255,30,0.4)"/></marker></defs>
+          <path d="M108 57 L120 57" stroke="rgba(212,255,30,0.3)" stroke-width="1.5" marker-end="url(#ar)"/>
+          <path d="M212 57 L224 57" stroke="rgba(212,255,30,0.3)" stroke-width="1.5" marker-end="url(#ar)"/>
+          <path d="M316 57 L328 57" stroke="rgba(212,255,30,0.3)" stroke-width="1.5" marker-end="url(#ar)"/>
+          <path d="M20 24 L88 24 L84 84 L24 84 Z" fill="none" stroke="rgba(212,255,30,0.25)" stroke-width="1.5"/>
+          <rect x="16" y="16" width="72" height="10" fill="#0d0c09" rx="1"/>
+          <circle cx="80" cy="16" r="5" fill="#0d0c09" stroke="#D4FF1E" stroke-width="1"/><circle cx="80" cy="16" r="2.5" fill="#D4FF1E"/>
+          <text x="54" y="104" fill="rgba(212,255,30,0.2)" font-family="Fira Code,monospace" font-size="7" text-anchor="middle">БУНКЕР</text>
+          <circle cx="160" cy="56" r="22" fill="none" stroke="rgba(212,255,30,0.25)" stroke-width="1.5"/>
+          <line x1="160" y1="56" x2="160" y2="36" stroke="#D4FF1E" stroke-width="1.5" id="mxArm" style="transform-origin:160px 56px;animation:spin 2.2s linear infinite"/>
+          <circle cx="160" cy="56" r="3.5" fill="rgba(212,255,30,0.3)"/>
+          <circle cx="184" cy="22" r="5" fill="#0d0c09" stroke="#D4FF1E" stroke-width="1"/><circle cx="184" cy="22" r="2.5" fill="#D4FF1E"/>
+          <text x="160" y="104" fill="rgba(212,255,30,0.2)" font-family="Fira Code,monospace" font-size="7" text-anchor="middle">СМЕСИТЕЛЬ</text>
+          <rect x="226" y="30" width="76" height="46" rx="2" fill="none" stroke="rgba(212,255,30,0.25)" stroke-width="1.5"/>
+          <rect x="232" y="35" width="15" height="36" rx="1" fill="#0d0c09"/><rect x="252" y="35" width="15" height="36" rx="1" fill="#0d0c09"/><rect x="272" y="35" width="15" height="36" rx="1" fill="#0d0c09"/>
+          <circle cx="239" cy="53" r="3.5" fill="rgba(212,255,30,0.25)"/><circle cx="259" cy="48" r="3" fill="rgba(212,255,30,0.25)"/><circle cx="259" cy="62" r="3.5" fill="rgba(212,255,30,0.25)"/><circle cx="279" cy="55" r="3" fill="rgba(212,255,30,0.25)"/>
+          <circle cx="293" cy="22" r="5" fill="#0d0c09" stroke="#D4FF1E" stroke-width="1"/><circle cx="293" cy="22" r="2.5" fill="#D4FF1E"/>
+          <text x="264" y="104" fill="rgba(212,255,30,0.2)" font-family="Fira Code,monospace" font-size="7" text-anchor="middle">ГРАНУЛЯТОР</text>
+          <ellipse cx="371" cy="57" rx="30" ry="22" fill="none" stroke="rgba(212,255,30,0.25)" stroke-width="1.5"/>
+          <path d="M349 49 Q357 41 365 49 Q373 57 381 49 Q389 41 396 49" fill="none" stroke="rgba(245,158,11,0.6)" stroke-width="1.2"/>
+          <path d="M349 62 Q357 54 365 62 Q373 70 381 62 Q389 54 396 62" fill="none" stroke="rgba(245,158,11,0.35)" stroke-width="1"/>
+          <circle cx="393" cy="20" r="5" fill="#0d0c09" stroke="#D4FF1E" stroke-width="1"/><circle cx="393" cy="20" r="2.5" fill="#D4FF1E"/>
+          <text x="371" y="104" fill="rgba(212,255,30,0.2)" font-family="Fira Code,monospace" font-size="7" text-anchor="middle">СУШИЛКА</text>
+          <text x="6" y="9" fill="rgba(212,255,30,0.15)" font-family="Fira Code,monospace" font-size="6">← ВХОД</text>
+          <text x="358" y="9" fill="rgba(212,255,30,0.15)" font-family="Fira Code,monospace" font-size="6">ВЫХОД →</text>
         </svg>
         <style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>
       </div>
-      <div class="d-lgrid">
-        <div class="d-lcard">
-          <div class="d-ll">ВЛАЖНОСТЬ ВХОДА</div>
-          <div><span class="d-lv" id="dHum">22.8</span><span class="d-lu">%</span></div>
-          <div class="d-lt dn">▼ −0.3 · 5s ago</div>
-          <svg id="spkH" class="d-spark" viewBox="0 0 68 16" preserveAspectRatio="none" style="width:100%;height:16px"></svg>
-        </div>
-        <div class="d-lcard">
-          <div class="d-ll">СКОРОСТЬ ПОДАЧИ</div>
-          <div><span class="d-lv" id="dFeed">14.0</span><span class="d-lu">TPH</span></div>
-          <div class="d-lt up">▲ STABLE</div>
-          <svg id="spkF" class="d-spark" viewBox="0 0 68 16" preserveAspectRatio="none" style="width:100%;height:16px"></svg>
-        </div>
-        <div class="d-lcard">
-          <div class="d-ll">ТЕМП. КАМЕРЫ</div>
-          <div><span class="d-lv" id="dTemp">13.0</span><span class="d-lu">°C</span></div>
-          <div class="d-lt">↔ ±0.5° норма</div>
-          <svg id="spkT" class="d-spark" viewBox="0 0 68 16" preserveAspectRatio="none" style="width:100%;height:16px"></svg>
-        </div>
-        <div class="d-lcard">
-          <div class="d-ll">ДАВЛЕНИЕ ГРАН.</div>
-          <div><span class="d-lv" id="dPress">2.4</span><span class="d-lu">BAR</span></div>
-          <div class="d-lt up">▲ +0.1 OK</div>
-          <svg id="spkP" class="d-spark" viewBox="0 0 68 16" preserveAspectRatio="none" style="width:100%;height:16px"></svg>
-        </div>
+      <div class="dlgrid">
+        <div class="dlc"><div class="dll">ВЛАЖНОСТЬ ВХОДА</div><div><span class="dlv" id="dHum">22.8</span><span class="dlu">%</span></div><div class="dlt dn">▼ −0.3 · 5s ago</div><svg id="spkH" class="dspk" viewBox="0 0 68 16" preserveAspectRatio="none" style="width:100%;height:16px"></svg></div>
+        <div class="dlc"><div class="dll">СКОРОСТЬ ПОДАЧИ</div><div><span class="dlv" id="dFeed">14.0</span><span class="dlu">TPH</span></div><div class="dlt up">▲ STABLE</div><svg id="spkF" class="dspk" viewBox="0 0 68 16" preserveAspectRatio="none" style="width:100%;height:16px"></svg></div>
+        <div class="dlc"><div class="dll">ТЕМП. КАМЕРЫ</div><div><span class="dlv" id="dTemp">13.0</span><span class="dlu">°C</span></div><div class="dlt">↔ ±0.5° норма</div><svg id="spkT" class="dspk" viewBox="0 0 68 16" preserveAspectRatio="none" style="width:100%;height:16px"></svg></div>
+        <div class="dlc"><div class="dll">ДАВЛЕНИЕ ГРАН.</div><div><span class="dlv" id="dPress">2.4</span><span class="dlu">BAR</span></div><div class="dlt up">▲ +0.1 OK</div><svg id="spkP" class="dspk" viewBox="0 0 68 16" preserveAspectRatio="none" style="width:100%;height:16px"></svg></div>
       </div>
-      <div class="d-iot">
-        <div class="d-iot-t">БЕСПРОВОДНЫЕ IoT-ДАТЧИКИ · MESH СЕТЬ</div>
-        <div class="d-nodes">
-          <div class="d-node"><div class="d-nbox">📦<div class="d-npulse"></div></div><div class="d-nl">БУНКЕР<br>S-01</div></div>
-          <div class="d-nline"></div>
-          <div class="d-node"><div class="d-nbox">💧<div class="d-npulse" style="animation-delay:.5s"></div></div><div class="d-nl">ВЛАЖН.<br>S-02</div></div>
-          <div class="d-nline"></div>
-          <div class="d-node"><div class="d-nbox">⚙️<div class="d-npulse" style="animation-delay:1s"></div></div><div class="d-nl">СМЕСИТ.<br>S-03</div></div>
-          <div class="d-nline"></div>
-          <div class="d-node"><div class="d-nbox">🔩<div class="d-npulse" style="animation-delay:1.5s"></div></div><div class="d-nl">ГРАН.<br>S-04</div></div>
-          <div class="d-nline"></div>
-          <div class="d-node"><div class="d-nbox">🌡️<div class="d-npulse" style="animation-delay:2s"></div></div><div class="d-nl">ТЕМП.<br>S-05</div></div>
+      <div class="diot">
+        <div class="diot-t">БЕСПРОВОДНЫЕ IoT-ДАТЧИКИ · MESH</div>
+        <div class="dnodes">
+          <div class="dnode"><div class="dnbox">📦<div class="dnpulse"></div></div><div class="dnl">БУНКЕР<br>S-01</div></div>
+          <div class="dnline"></div>
+          <div class="dnode"><div class="dnbox">💧<div class="dnpulse" style="animation-delay:.5s"></div></div><div class="dnl">ВЛАЖН.<br>S-02</div></div>
+          <div class="dnline"></div>
+          <div class="dnode"><div class="dnbox">⚙️<div class="dnpulse" style="animation-delay:1s"></div></div><div class="dnl">СМЕСИТ.<br>S-03</div></div>
+          <div class="dnline"></div>
+          <div class="dnode"><div class="dnbox">🔩<div class="dnpulse" style="animation-delay:1.5s"></div></div><div class="dnl">ГРАН.<br>S-04</div></div>
+          <div class="dnline"></div>
+          <div class="dnode"><div class="dnbox">🌡️<div class="dnpulse" style="animation-delay:2s"></div></div><div class="dnl">ТЕМП.<br>S-05</div></div>
         </div>
       </div>
     </div>
-
-    <!-- PANEL C -->
-    <div class="d-panel">
-      <div class="d-ptag">Блок В · AI-ядро</div>
+ 
+    <!-- C -->
+    <div class="dp">
+      <div class="dp-tag">Блок В · AI-ядро</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div class="d-ptitle">AI FORMULATION</div>
-        <div class="d-pbadge blue">AI ACTIVE</div>
+        <div class="dp-title">AI FORMULATION</div>
+        <div class="dp-badge bl">AI ACTIVE</div>
       </div>
-      <div class="d-sbox">
+      <div class="dsbox">
         <div>
-          <div style="font-family:var(--mono);font-size:7px;color:#3a5030;letter-spacing:1px;margin-bottom:4px">ПРОЧНОСТЬ ГРАНУЛЫ</div>
-          <div class="d-sbig" id="dMpa">5.9<small>MPa</small></div>
+          <div style="font-family:var(--mono);font-size:7px;color:rgba(212,255,30,.25);letter-spacing:1px;margin-bottom:5px">ПРОЧНОСТЬ ГРАНУЛЫ</div>
+          <div class="dsbig" id="dMpa">5.9<small>MPa</small></div>
         </div>
-        <div class="d-stgt">
-          <div class="d-stgt-l">ЦЕЛЬ</div>
-          <div class="d-stgt-v">6.2 MPa</div>
-          <div class="d-stgt-d" id="dDelta">△ +0.3</div>
-        </div>
-      </div>
-      <div class="d-chart">
-        <svg id="dChart" viewBox="0 0 220 84" preserveAspectRatio="none" style="width:100%;height:84px;display:block"></svg>
-      </div>
-      <div class="d-recipe">
-        <div class="d-rt">РЕЦЕПТУРА · АВТОКОРРЕКЦИЯ</div>
-        <div class="d-srow">
-          <div class="d-sh">
-            <span class="d-sn">Binder A <span class="d-sc">Гуматы</span></span>
-            <span class="d-sv" id="dBA">+1.2%</span>
-          </div>
-          <div class="d-strk">
-            <div class="d-sfill" id="dBAF" style="width:62%"></div>
-            <div class="d-sthumb" id="dBAT" style="left:62%"></div>
-          </div>
-        </div>
-        <div class="d-srow" style="margin-bottom:0">
-          <div class="d-sh">
-            <span class="d-sn">Binder B <span class="d-sc">Биочар</span></span>
-            <span class="d-sv neg" id="dBB">−0.5%</span>
-          </div>
-          <div class="d-strk">
-            <div class="d-sfill neg" id="dBBF" style="width:42%"></div>
-            <div class="d-sthumb neg" id="dBBT" style="left:42%"></div>
-          </div>
+        <div class="dstgt">
+          <div class="dstgt-l">ЦЕЛЬ</div>
+          <div class="dstgt-v">6.2 MPa</div>
+          <div class="dstgt-d" id="dDelta">△ +0.3</div>
         </div>
       </div>
-      <div class="d-log">
-        <div class="d-log-t">AI LOG <span class="d-ai-tag">RUNNING</span></div>
+      <div class="dchart"><svg id="dChart" viewBox="0 0 220 82" preserveAspectRatio="none" style="width:100%;height:82px;display:block"></svg></div>
+      <div class="drecipe">
+        <div class="drt">РЕЦЕПТУРА · АВТОКОРРЕКЦИЯ</div>
+        <div class="dsrow">
+          <div class="dsh"><span class="dsn">Binder A <span class="dsc">Гуматы</span></span><span class="dsv" id="dBA">+1.2%</span></div>
+          <div class="dstrk"><div class="dsfill" id="dBAF" style="width:62%"></div><div class="dsthumb" id="dBAT" style="left:62%"></div></div>
+        </div>
+        <div class="dsrow" style="margin-bottom:0">
+          <div class="dsh"><span class="dsn">Binder B <span class="dsc">Биочар</span></span><span class="dsv neg" id="dBB">−0.5%</span></div>
+          <div class="dstrk"><div class="dsfill neg" id="dBBF" style="width:42%"></div><div class="dsthumb neg" id="dBBT" style="left:42%"></div></div>
+        </div>
+      </div>
+      <div class="dlog">
+        <div class="dlog-t">AI LOG <span class="dai-tag">RUNNING</span></div>
         <div id="dLogBody">
-          <div class="d-le"><span class="d-ts">09:14:03</span><span class="d-tm g">[INIT] AI Engine v3.1 · загружена</span></div>
-          <div class="d-le"><span class="d-ts">09:14:11</span><span class="d-tm">[SCAN] Влажность сырья: 22.8%</span></div>
-          <div class="d-le"><span class="d-ts">09:14:22</span><span class="d-tm w">[WARN] MPa ниже цели: 5.9 → 6.2</span></div>
-          <div class="d-le"><span class="d-ts">09:14:28</span><span class="d-tm g">[AI] Рецепт оптимизирован</span></div>
+          <div class="dle"><span class="dts">09:14:03</span><span class="dtm g">[INIT] AI Engine v3.1 · загружена</span></div>
+          <div class="dle"><span class="dts">09:14:11</span><span class="dtm">[SCAN] Влажность сырья: 22.8%</span></div>
+          <div class="dle"><span class="dts">09:14:22</span><span class="dtm w">[WARN] MPa ниже цели: 5.9 → 6.2</span></div>
+          <div class="dle"><span class="dts">09:14:28</span><span class="dtm g">[AI] Рецепт оптимизирован</span></div>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="dash-footer">
-    <div class="dash-footer-items">
+ 
+  <div class="dash-foot">
+    <div class="df-items">
       <div class="df-item"><span>СИСТЕМА:</span><span>NOMAD-CORE v2.4.1</span></div>
       <div class="df-item"><span>СТАТУС:</span><span>ВСЕ КОНТУРЫ АКТИВНЫ</span></div>
       <div class="df-item"><span>ОБЪЕКТ:</span><span>ОТВАЛ №3 · КЗ-СЕВ</span></div>
     </div>
-    <div style="color:#3a5030;letter-spacing:1px">NOMAD-M © 2024</div>
+    <div>NOMAD-M © 2024</div>
   </div>
 </section>
-
-<!-- ─── WHY ─── -->
-<section class="section section-alt">
-  <div class="section-inner">
+ 
+<!-- WHY -->
+<section class="s s-alt">
+  <div class="s-inner">
     <div class="eyebrow rv">Преимущества</div>
-    <h2 class="section-title rv">Почему это <em>работает там, где другие нет</em></h2>
-    <p class="section-lead rv">Четыре ключевых отличия, которые делают NOMAD-M рентабельным.</p>
-    <div class="help-list rv">
-      <div class="hl">
-        <div class="hl-icon">🚛</div>
-        <div><div class="hl-title">Мобильность</div><div class="hl-desc">Завод разворачивается за 4 часа. Не нужно строить инфраструктуру — подключаем к электричеству и начинаем. После работы переезжает к следующему отвалу.</div></div>
-      </div>
-      <div class="hl">
-        <div class="hl-icon">🤖</div>
-        <div><div class="hl-title">Один оператор — несколько заводов</div><div class="hl-desc">ИИ сам регулирует рецептуру, БПЛА сам выбирает оптимальное сырьё, IoT сам сигнализирует об отклонениях. Один человек управляет несколькими контейнерами удалённо.</div></div>
-      </div>
-      <div class="hl">
-        <div class="hl-icon">♻️</div>
-        <div><div class="hl-title">Двойная монетизация</div><div class="hl-desc">Предприятие платит за утилизацию отвала — это один поток дохода. Плюс продажа готовых гранул на сельхозрынке. Два источника выручки с одной установки.</div></div>
-      </div>
-      <div class="hl">
-        <div class="hl-icon">📊</div>
-        <div><div class="hl-title">Цифровой паспорт каждой партии</div><div class="hl-desc">Каждая партия гранул сопровождается полным протоколом: влажность сырья, рецептура, прочность на выходе. Это то, что требует современный сельхозрынок.</div></div>
-      </div>
+    <h2 class="sh2 rv">Почему это работает <em>там, где другие нет</em></h2>
+    <p class="s-lead rv">Четыре конкретных отличия, которые делают NOMAD-M рентабельным.</p>
+    <div class="why-grid rv">
+      <div class="why-item"><div class="why-icon">🚛</div><div><div class="why-title">Мобильность</div><div class="why-desc">Разворачивается за 4 часа. Никакой инфраструктуры — подключили электричество и начали. После работы переезжает к следующему отвалу.</div></div></div>
+      <div class="why-item"><div class="why-icon">🤖</div><div><div class="why-title">Один оператор — несколько заводов</div><div class="why-desc">ИИ регулирует рецептуру, БПЛА выбирает сырьё, IoT сигнализирует об отклонениях. Один человек управляет несколькими контейнерами удалённо.</div></div></div>
+      <div class="why-item"><div class="why-icon">♻️</div><div><div class="why-title">Двойная монетизация</div><div class="why-desc">Предприятие платит за утилизацию + доход от продажи гранул на рынке. Два источника выручки с одной установки.</div></div></div>
+      <div class="why-item"><div class="why-icon">📊</div><div><div class="why-title">Цифровой паспорт партии</div><div class="why-desc">Каждая партия — полный протокол: влажность сырья, рецептура, прочность на выходе. То, что требует современный рынок.</div></div></div>
     </div>
   </div>
 </section>
-
-<!-- ─── ROADMAP ─── -->
-<section id="roadmap" class="section">
-  <div class="section-inner">
+ 
+<!-- ROADMAP -->
+<section id="roadmap" class="s">
+  <div class="s-inner">
     <div class="eyebrow rv">Дорожная карта</div>
-    <h2 class="section-title rv">Этапы <em>реализации</em></h2>
-    <p class="section-lead rv">От демо-прототипа до флота мобильных заводов.</p>
+    <h2 class="sh2 rv">Этапы <em>реализации</em></h2>
+    <p class="s-lead rv">От демо-прототипа до флота мобильных заводов.</p>
     <div class="roadmap rv">
-      <div class="rm-item">
-        <div class="rm-left"><div class="rm-phase">Этап 1</div><div class="rm-time">Q1–Q2 2024</div><div class="rm-dot now"></div></div>
-        <div>
-          <div class="rm-title">Прототип и демо-система ✅</div>
-          <div class="rm-desc">Разработка NOMAD-Core — интерфейса оператора с живой симуляцией трёх контуров управления. Figma-прототип и рабочий HTML-дашборд для показа инвесторам.</div>
-          <div class="rm-tags"><span class="rm-tag rm-done">✓ FIGMA PROTOTYPE</span><span class="rm-tag rm-done">✓ NOMAD-CORE UI</span><span class="rm-tag rm-done">✓ INVESTOR DEMO</span></div>
-        </div>
-      </div>
-      <div class="rm-item">
-        <div class="rm-left"><div class="rm-phase">Этап 2</div><div class="rm-time">Q3 2024</div><div class="rm-dot"></div></div>
-        <div>
-          <div class="rm-title">MVP — первый контейнер</div>
-          <div class="rm-desc">Сборка первого мобильного контейнера 40ft с полной производственной линией. Интеграция IoT-датчиков и первые тестовые запуски на реальном сырье с отвала.</div>
-          <div class="rm-tags"><span class="rm-tag">HARDWARE</span><span class="rm-tag">IoT INTEGRATION</span><span class="rm-tag">PILOT TEST</span></div>
-        </div>
-      </div>
-      <div class="rm-item">
-        <div class="rm-left"><div class="rm-phase">Этап 3</div><div class="rm-time">Q4 2024</div><div class="rm-dot"></div></div>
-        <div>
-          <div class="rm-title">Первый коммерческий запуск</div>
-          <div class="rm-desc">Запуск на действующем отвале. Подключение БПЛА-разведки в реальных условиях, калибровка ИИ под конкретный тип сырья, сертификация гранул для рынка.</div>
-          <div class="rm-tags"><span class="rm-tag">DRONE INTEGRATION</span><span class="rm-tag">AI CALIBRATION</span><span class="rm-tag">CERTIFICATION</span></div>
-        </div>
-      </div>
-      <div class="rm-item" style="border-bottom:none">
-        <div class="rm-left"><div class="rm-phase">Этап 4</div><div class="rm-time">2025+</div><div class="rm-dot"></div></div>
-        <div>
-          <div class="rm-title">Масштабирование — флот контейнеров</div>
-          <div class="rm-desc">Серийное производство, выход на рынки Казахстана, России и Центральной Азии. Лицензирование технологии для крупных горно-химических предприятий.</div>
-          <div class="rm-tags"><span class="rm-tag">SCALE-UP</span><span class="rm-tag">LICENSING</span><span class="rm-tag">CIS MARKET</span></div>
-        </div>
-      </div>
+      <div class="rm-item"><div class="rm-left"><div class="rm-phase">Этап 1</div><div class="rm-time">Q1–Q2 2024</div><div class="rm-dot now"></div></div><div><div class="rm-title">Прототип и демо ✅</div><div class="rm-desc">Разработка NOMAD-Core — интерфейса оператора с симуляцией трёх контуров. Демо для инвесторов.</div><div class="rm-tags"><span class="rm-tag done">✓ FIGMA</span><span class="rm-tag done">✓ NOMAD-CORE UI</span><span class="rm-tag done">✓ INVESTOR DEMO</span></div></div></div>
+      <div class="rm-item"><div class="rm-left"><div class="rm-phase">Этап 2</div><div class="rm-time">Q3 2024</div><div class="rm-dot"></div></div><div><div class="rm-title">MVP — первый контейнер</div><div class="rm-desc">Сборка контейнера 40ft с производственной линией. Интеграция IoT и первые тесты на реальном сырье.</div><div class="rm-tags"><span class="rm-tag">HARDWARE</span><span class="rm-tag">IoT</span><span class="rm-tag">PILOT TEST</span></div></div></div>
+      <div class="rm-item"><div class="rm-left"><div class="rm-phase">Этап 3</div><div class="rm-time">Q4 2024</div><div class="rm-dot"></div></div><div><div class="rm-title">Первый коммерческий запуск</div><div class="rm-desc">Запуск на действующем отвале. БПЛА в реальных условиях, калибровка ИИ, сертификация гранул.</div><div class="rm-tags"><span class="rm-tag">DRONE</span><span class="rm-tag">AI CALIBRATION</span><span class="rm-tag">CERT</span></div></div></div>
+      <div class="rm-item" style="border-bottom:none"><div class="rm-left"><div class="rm-phase">Этап 4</div><div class="rm-time">2025+</div><div class="rm-dot"></div></div><div><div class="rm-title">Масштабирование</div><div class="rm-desc">Серийное производство, выход на рынки Казахстана, России и ЦА. Лицензирование технологии.</div><div class="rm-tags"><span class="rm-tag">SCALE-UP</span><span class="rm-tag">LICENSING</span><span class="rm-tag">CIS</span></div></div></div>
     </div>
   </div>
 </section>
-
-<!-- ─── FOOTER ─── -->
+ 
+<!-- FOOTER -->
 <footer>
   <div class="f-brand">NOMAD<em>-M</em></div>
-  <div class="f-links">
-    <a href="#problem">Проблема</a>
-    <a href="#solution">Решение</a>
-    <a href="#tech">Технология</a>
-    <a href="#dashboard">Система</a>
-    <a href="#roadmap">Этапы</a>
-  </div>
+  <div class="f-links"><a href="#problem">Проблема</a><a href="#solution">Решение</a><a href="#tech">Технология</a><a href="#dashboard">Система</a><a href="#roadmap">Этапы</a></div>
   <div class="f-copy">© 2024 NOMAD-M · Climate-Tech · Kazakhstan</div>
 </footer>
-
+ 
 <script>
-// ── CLOCK ──
+/* ── CURSOR ── */
+const cg=document.getElementById('cursorGlow');
+document.addEventListener('mousemove',e=>{cg.style.transform=`translate(${e.clientX-200}px,${e.clientY-200}px)`;});
+ 
+/* ── CLOCK ── */
 function tick(){document.getElementById('dashClock').textContent=new Date().toTimeString().slice(0,8);}
 setInterval(tick,1000);tick();
-
-// ── VOXEL CANVAS (shared helper) ──
+ 
+/* ── HERO PARTICLES ── */
+(function(){
+  const c=document.getElementById('heroParticles');
+  const ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;createPts();}
+  function createPts(){
+    pts=[];
+    const n=Math.floor(W*H/18000);
+    for(let i=0;i<n;i++){pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.5,a:Math.random()});}
+  }
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);t+=.004;
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      const a=(.3+Math.sin(t+p.a*6.28)*.15)*p.a;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(212,255,30,${a})`;ctx.fill();
+    });
+    // connect nearby
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<120){
+          ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+          ctx.strokeStyle=`rgba(212,255,30,${(1-d/120)*.06})`;ctx.lineWidth=.5;ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize);
+  resize();draw();
+})();
+ 
+/* ── VOXEL ── */
 function initVoxel(id,H){
   const c=document.getElementById(id);if(!c)return;
   const ctx=c.getContext('2d');
   const W=c.offsetWidth||320;c.width=W;c.height=H;
-  const cols=28,rows=Math.round(H/cw_h(H)),cw=W/cols,ch=H/rows;
-  function cw_h(h){return h/Math.round(h/(W/28));}
-  const R=Math.round(H/(W/28/1.1));
-  const cH=H/R;
+  const cols=28,rows=Math.max(8,Math.round(H/(W/28)));
+  const cw=W/cols,ch=H/rows;
   const grid=[];
-  for(let r=0;r<R;r++){grid[r]=[];for(let cc=0;cc<cols;cc++){const cx=(cc-cols/2)/cols*2,cy=(r-R/2)/R*2;const d=Math.sqrt(cx*cx+cy*cy*.7);grid[r][cc]=Math.min(1,Math.max(0,1-d*1.35)+Math.random()*.22);}}
-  function lc(t){const s=[[10,24,6],[26,66,14],[76,144,26],[168,224,60],[255,196,0],[255,106,0]];const i2=t*(s.length-1);const i=Math.floor(i2),f=i2-i;const a=s[Math.min(i,s.length-1)],b=s[Math.min(i+1,s.length-1)];return`rgb(${Math.round(a[0]+(b[0]-a[0])*f)},${Math.round(a[1]+(b[1]-a[1])*f)},${Math.round(a[2]+(b[2]-a[2])*f)})`;}
-  let t=0;
-  (function draw(){ctx.clearRect(0,0,W,H);t++;
-    for(let r=0;r<R;r++){for(let cc=0;cc<cols;cc++){const n=Math.sin(t*.022+cc*.32+r*.26)*.03;const v=Math.max(0,Math.min(1,grid[r][cc]+n));ctx.fillStyle=lc(v);ctx.fillRect(cc*cw+.4,r*cH+.4,cw-.4,cH-.4);ctx.strokeStyle='rgba(0,0,0,.28)';ctx.lineWidth=.35;ctx.strokeRect(cc*cw+.4,r*cH+.4,cw-.4,cH-.4);}}
+  for(let r=0;r<rows;r++){grid[r]=[];for(let cc=0;cc<cols;cc++){const cx=(cc-cols/2)/cols*2,cy=(r-rows/2)/rows*2;const d=Math.sqrt(cx*cx+cy*cy*.7);grid[r][cc]=Math.min(1,Math.max(0,1-d*1.35)+Math.random()*.22);}}
+  function lc(t){const s=[[10,20,3],[22,58,8],[68,130,18],[148,210,50],[212,255,30],[255,200,0],[235,100,0]];const i2=t*(s.length-1);const i=Math.floor(i2),f=i2-i;const a=s[Math.min(i,s.length-1)],b=s[Math.min(i+1,s.length-1)];return`rgba(${Math.round(a[0]+(b[0]-a[0])*f)},${Math.round(a[1]+(b[1]-a[1])*f)},${Math.round(a[2]+(b[2]-a[2])*f)},0.85)`;}
+  let t2=0;
+  (function draw(){ctx.clearRect(0,0,W,H);t2++;
+    for(let r=0;r<rows;r++){for(let cc=0;cc<cols;cc++){const n=Math.sin(t2*.02+cc*.3+r*.25)*.032;const v=Math.max(0,Math.min(1,grid[r][cc]+n));ctx.fillStyle=lc(v);ctx.fillRect(cc*cw+.3,r*ch+.3,cw-.3,ch-.3);ctx.strokeStyle='rgba(0,0,0,.22)';ctx.lineWidth=.3;ctx.strokeRect(cc*cw+.3,r*ch+.3,cw-.3,ch-.3);}}
   requestAnimationFrame(draw);})();
 }
-initVoxel('heroCanvas',180);
-initVoxel('dashCanvas',150);
-
-// ── SPARKLINE ──
+initVoxel('dashCanvas',148);
+ 
+/* ── SPARKLINE ── */
 function spk(id,data,col){
   const s=document.getElementById(id);if(!s)return;
   const W=68,H=16,mn=Math.min(...data),mx=Math.max(...data),r=mx-mn||1;
   const pts=data.map((v,i)=>`${i/(data.length-1)*W},${H-((v-mn)/r)*(H-3)-1.5}`).join(' ');
-  const lx=W,ly=H-((data[data.length-1]-mn)/r)*(H-3)-1.5;
-  s.innerHTML=`<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.3" opacity=".8"/><circle cx="${lx}" cy="${ly}" r="2" fill="${col}"/>`;
+  s.innerHTML=`<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.3" opacity=".8"/><circle cx="${W}" cy="${H-((data[data.length-1]-mn)/r)*(H-3)-1.5}" r="2" fill="${col}"/>`;
 }
-
-// ── DATA STATE ──
+ 
+/* ── DATA ── */
 let hD=Array(14).fill(22.8).map(v=>v+(Math.random()-.5)*.25);
 let fD=Array(14).fill(14).map(v=>v+(Math.random()-.5)*.18);
 let tD=Array(14).fill(13).map(v=>v+(Math.random()-.5)*.35);
 let pD=Array(14).fill(2.4).map(v=>v+(Math.random()-.5)*.07);
-let mD=Array(34).fill(0).map((_,i)=>5.2+i/34*0.85+(Math.random()-.5)*.09);
-
+let mD=Array(34).fill(0).map((_,i)=>5.2+i/34*.85+(Math.random()-.5)*.09);
+ 
 function upd(){
-  // humidity
   const h=Math.max(21.4,Math.min(24.6,hD[hD.length-1]+(Math.random()-.5)*.22));hD.push(h);hD.shift();
   document.getElementById('dHum').textContent=h.toFixed(1);
   document.getElementById('tm-hum').textContent=h.toFixed(1)+'%';
-  document.getElementById('tm-hum-bar').style.width=(h/50*100)+'%';
-  if(document.getElementById('hHum'))document.getElementById('hHum').textContent=h.toFixed(1)+'%';
-  spk('spkH',hD,'#5cbf2a');
-
-  // feed
+  const hmb=document.getElementById('tm-hum-bar');if(hmb)hmb.style.width=(h/50*100)+'%';
+  spk('spkH',hD,'#D4FF1E');
+ 
   const f=Math.max(13.4,Math.min(14.7,fD[fD.length-1]+(Math.random()-.5)*.12));fD.push(f);fD.shift();
-  document.getElementById('dFeed').textContent=f.toFixed(1);spk('spkF',fD,'#5cbf2a');
-
-  // temp
+  document.getElementById('dFeed').textContent=f.toFixed(1);spk('spkF',fD,'#D4FF1E');
+ 
   const tm=Math.max(12.4,Math.min(14.0,tD[tD.length-1]+(Math.random()-.5)*.22));tD.push(tm);tD.shift();
-  document.getElementById('dTemp').textContent=tm.toFixed(1);spk('spkT',tD,'#5cbf2a');
-
-  // pressure
+  document.getElementById('dTemp').textContent=tm.toFixed(1);spk('spkT',tD,'#D4FF1E');
+ 
   const pr=Math.max(2.22,Math.min(2.64,pD[pD.length-1]+(Math.random()-.5)*.035));pD.push(pr);pD.shift();
-  document.getElementById('dPress').textContent=pr.toFixed(1);spk('spkP',pD,'#4fc3f7');
-
-  // mpa
+  document.getElementById('dPress').textContent=pr.toFixed(1);spk('spkP',pD,'#60A5FA');
+ 
   const lm=mD[mD.length-1],dr=lm<6.2?.013:-.007;
   const nm=Math.max(5.6,Math.min(6.42,lm+dr+(Math.random()-.5)*.042));mD.push(nm);mD.shift();
   document.getElementById('dMpa').innerHTML=nm.toFixed(1)+'<small>MPa</small>';
   document.getElementById('tm-mpa').textContent=nm.toFixed(1)+' MPa';
-  document.getElementById('tm-mpa-bar').style.width=((nm-5)/2*100)+'%';
-  if(document.getElementById('hMpa'))document.getElementById('hMpa').textContent=nm.toFixed(1)+' MPa';
+  const tmb=document.getElementById('tm-mpa-bar');if(tmb)tmb.style.width=((nm-5)/2*100)+'%';
   const dl=(6.2-nm).toFixed(1);
-  const dd=document.getElementById('dDelta');dd.textContent=dl>0?`△ +${dl}`:`▽ ${Math.abs(dl)}`;dd.style.color=dl>0?'#5a8a30':'#c0402a';
-
+  const dd=document.getElementById('dDelta');
+  dd.textContent=dl>0?`△ +${dl}`:`▽ ${Math.abs(dl)}`;
+  dd.style.color=dl>0?'rgba(212,255,30,.6)':'rgba(239,68,68,.7)';
+ 
   drawChart();
-
-  // binders
+ 
   const ba=1.2+(Math.random()-.5)*.1;
   document.getElementById('dBA').textContent=(ba>=0?'+':'')+ba.toFixed(1)+'%';
   const baW=50+ba/3*50;document.getElementById('dBAF').style.width=baW+'%';document.getElementById('dBAT').style.left=baW+'%';
   const bb=-0.5+(Math.random()-.5)*.07;
   document.getElementById('dBB').textContent=bb.toFixed(1)+'%';
   const bbW=50+bb/3*50;document.getElementById('dBBF').style.width=bbW+'%';document.getElementById('dBBT').style.left=bbW+'%';
-
-  // accuracy
+ 
   const ac=(98.1+Math.random()*.45).toFixed(1);
   document.getElementById('dAcc').innerHTML=ac+'<small>%</small>';
   document.getElementById('tm-acc').textContent=ac+'%';
-  if(document.getElementById('hAcc'))document.getElementById('hAcc').textContent=ac+'%';
 }
-
+ 
 function drawChart(){
   const s=document.getElementById('dChart');if(!s)return;
-  const W=220,H=84,mn=5.0,mx=6.8,r=mx-mn;
+  const W=220,H=82,mn=5.0,mx=6.8,r=mx-mn;
   const ty=H-((6.2-mn)/r)*(H-4)-2;
   const pts=mD.map((v,i)=>`${i/(mD.length-1)*(W-4)+2},${H-((v-mn)/r)*(H-4)-2}`);
   const area=`2,${H} `+pts.join(' ')+` ${W-2},${H}`;
   s.innerHTML=`
-    <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5cbf2a" stop-opacity=".12"/><stop offset="100%" stop-color="#5cbf2a" stop-opacity="0"/></linearGradient></defs>
-    <line x1="0" y1="${ty}" x2="${W}" y2="${ty}" stroke="#3a6a1a" stroke-width=".8" stroke-dasharray="4,3" opacity=".5"/>
-    <text x="${W-2}" y="${ty-3}" fill="#3a6a1a" font-family="JetBrains Mono,monospace" font-size="7" text-anchor="end">TARGET 6.2</text>
+    <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#D4FF1E" stop-opacity=".1"/><stop offset="100%" stop-color="#D4FF1E" stop-opacity="0"/></linearGradient></defs>
+    <line x1="0" y1="${ty}" x2="${W}" y2="${ty}" stroke="rgba(212,255,30,.2)" stroke-width=".8" stroke-dasharray="4,3"/>
+    <text x="${W-2}" y="${ty-3}" fill="rgba(212,255,30,.25)" font-family="Fira Code,monospace" font-size="7" text-anchor="end">TARGET 6.2</text>
     <polygon points="${area}" fill="url(#cg)"/>
-    <polyline points="${pts.join(' ')}" fill="none" stroke="#5cbf2a" stroke-width="1.8" stroke-linejoin="round"/>
-    <circle cx="${pts[pts.length-1].split(',')[0]}" cy="${pts[pts.length-1].split(',')[1]}" r="3" fill="#5cbf2a"/>
-    <text x="3" y="9" fill="#3a5030" font-family="JetBrains Mono,monospace" font-size="7">6.8</text>
-    <text x="3" y="${H/2+2}" fill="#3a5030" font-family="JetBrains Mono,monospace" font-size="7">5.9</text>
-    <text x="3" y="${H-1}" fill="#3a5030" font-family="JetBrains Mono,monospace" font-size="7">5.0</text>`;
+    <polyline points="${pts.join(' ')}" fill="none" stroke="#D4FF1E" stroke-width="1.8" stroke-linejoin="round"/>
+    <circle cx="${pts[pts.length-1].split(',')[0]}" cy="${pts[pts.length-1].split(',')[1]}" r="3" fill="#D4FF1E"/>
+    <text x="3" y="9" fill="rgba(212,255,30,.2)" font-family="Fira Code,monospace" font-size="7">6.8</text>
+    <text x="3" y="${H/2+2}" fill="rgba(212,255,30,.2)" font-family="Fira Code,monospace" font-size="7">5.9</text>
+    <text x="3" y="${H-1}" fill="rgba(212,255,30,.2)" font-family="Fira Code,monospace" font-size="7">5.0</text>`;
 }
-
+ 
 const logs=[
   {c:'',t:'[SCAN] Обновление 3D-карты отвала'},
   {c:'g',t:'[AI] Прогноз: +0.08 MPa через 4 мин'},
@@ -1145,37 +1092,64 @@ const logs=[
   {c:'g',t:'[AI] Binder A +0.1% превентивно'},
   {c:'',t:'[SCAN] БПЛА · след. проход 2 мин'},
   {c:'w',t:'[WARN] Влажность ↑22.9% → пересчёт'},
-  {c:'g',t:'[AI] Цель MPa достигнута 98% времени'},
+  {c:'g',t:'[AI] Цель MPa выполнена 98% времени'},
 ];
 let li=0;
 function addLog(){
   const b=document.getElementById('dLogBody');if(!b)return;
   const m=logs[li%logs.length];li++;
   const ts=new Date().toTimeString().slice(0,8);
-  const el=document.createElement('div');el.className='d-le';
-  el.innerHTML=`<span class="d-ts">${ts}</span><span class="d-tm ${m.c}">${m.t}</span>`;
+  const el=document.createElement('div');el.className='dle';
+  el.innerHTML=`<span class="dts">${ts}</span><span class="dtm ${m.c}">${m.t}</span>`;
   b.appendChild(el);if(b.children.length>14)b.removeChild(b.firstChild);
   b.parentElement.scrollTop=9999;
 }
-
-// density/moisture
+ 
 let dv=60,mv=35;
 setInterval(()=>{
-  dv=Math.max(50,Math.min(74,dv+(Math.random()-.5)*2));mv=Math.max(28,Math.min(42,mv+(Math.random()-.5)*1.6));
+  dv=Math.max(50,Math.min(74,dv+(Math.random()-.5)*2));
+  mv=Math.max(28,Math.min(42,mv+(Math.random()-.5)*1.6));
   document.getElementById('dDensV').textContent=(0.9+dv/100*1.1).toFixed(2)+' g/cm³';
   document.getElementById('dDensB').style.width=dv+'%';
   document.getElementById('dMoistV').textContent=mv.toFixed(1)+'%';
   document.getElementById('dMoistB').style.width=mv+'%';
 },2200);
-
-// init + intervals
-spk('spkH',hD,'#5cbf2a');spk('spkF',fD,'#5cbf2a');spk('spkT',tD,'#5cbf2a');spk('spkP',pD,'#4fc3f7');
+ 
+spk('spkH',hD,'#D4FF1E');spk('spkF',fD,'#D4FF1E');spk('spkT',tD,'#D4FF1E');spk('spkP',pD,'#60A5FA');
 drawChart();
 setInterval(upd,1300);setInterval(addLog,4200);
-
-// ── SCROLL REVEAL ──
-const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:.1});
+ 
+/* ── SCROLL REVEAL ── */
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(e.isIntersecting){
+    e.target.classList.add('in');
+    // animate bars inside revealed cards
+    e.target.querySelectorAll('.tmet-fill[data-w]').forEach(b=>{
+      setTimeout(()=>b.style.width=b.dataset.w+'%',100);
+    });
+  }
+}),{threshold:.1});
 document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+ 
+/* ── COUNT-UP NUMBERS ── */
+const countObs=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(!e.isIntersecting||e.target._counted)return;
+  e.target._counted=true;
+  const target=parseFloat(e.target.dataset.val);
+  const dec=e.target.dataset.dec||'';
+  const dur=1400;const start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    const val=target*ease;
+    e.target.textContent=(dec?val.toFixed(1):Math.round(val))+dec;
+    if(p<1)requestAnimationFrame(step);
+    else e.target.textContent=target+dec;
+  }
+  requestAnimationFrame(step);
+}),{threshold:.5});
+document.querySelectorAll('.js-count').forEach(el=>countObs.observe(el));
 </script>
 </body>
 </html>
+ 
